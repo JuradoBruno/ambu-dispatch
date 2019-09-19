@@ -37,9 +37,22 @@
               },
               {
                 "input": "src/global.scss"
+              },
+              {
+                "input": "node_modules/leaflet/dist/leaflet.css"
+              },
+              {
+                "input": "node_modules/leaflet-routing-machine/dist/leaflet-routing-machine.css"
               }
             ],
-            "scripts": []
+            "scripts": [
+              {
+                "input": "node_modules/leaflet/dist/leaflet.js"
+              },
+              {
+                "input": "node_modules/leaflet.tilelayer.pouchdbcached/L.TileLayer.PouchDBCached.js"
+              }
+            ]
           },
           "configurations": {
             "production": {
