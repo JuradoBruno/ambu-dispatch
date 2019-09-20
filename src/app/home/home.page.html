@@ -7,7 +7,9 @@
         [leafletOptions]="mainMapOptions"
         [leafletLayersControl]="layersControl"
         (leafletMapReady)="onMapAlmostReady($event)">        
-  </div>
- 
+    </div>
+    
+    <ion-button class="mission-button" (click)="getTheTruckMoving({})" [disabled]="disableMissionButton">Commencer la mission</ion-button>
+
   </div>
 </ion-content>

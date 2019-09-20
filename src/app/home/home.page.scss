@@ -2,13 +2,23 @@
     display: flex;
     width: 100vw;
     height: 100vh;      
+    justify-content: center;    
 }
 
 .ambulance-side {
     box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
 }
 
+.mission-button {
+    position: absolute;
+    bottom: 20px;
+    z-index: 2;
+    height: 50px;
+    width: 300px;
+}
+
 #map {
     height: 100%;
-    width: 100%
+    width: 100%;
+    z-index: 1;
 }
