@@ -1,6 +1,13 @@
 
 <ion-content>
-  <div id="map">
+  <div class="container">
+
+    <div id="map"
+        leaflet
+        [leafletOptions]="mainMapOptions"
+        [leafletLayersControl]="layersControl"
+        (leafletMapReady)="onMapReady($event)">        
+  </div>
  
   </div>
 </ion-content>
