@@ -6,10 +6,15 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start:fr": "ng serve --configuration=fr",
+    "start:es": "ng serve --configuration=es",
     "build": "ng build",
+    "build:fr": "ng build --configuration=fr",
+    "build:es": "ng build --configuration=es",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "int:extract": "ng xi18n --output-path locale"
   },
   "private": true,
   "dependencies": {

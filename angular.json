@@ -73,6 +73,22 @@
                 }
               ]
             },
+            "fr": {
+              "aot": true,
+              "outputPath": "dist/under-c-fr/",
+              "i18nFile": "src/locale/messages.fr.xlf",
+              "i18nFormat": "xlf",
+              "i18nLocale": "fr",
+              "i18nMissingTranslation": "error"
+            },
+            "es": {
+              "aot": true,
+              "outputPath": "dist/under-c-es/",
+              "i18nFile": "src/locale/messages.es.xlf",
+              "i18nFormat": "xlf",
+              "i18nLocale": "es",
+              "i18nMissingTranslation": "error"              
+            },
             "ci": {
               "progress": false
             }
@@ -86,6 +102,12 @@
           "configurations": {
             "production": {
               "browserTarget": "app:build:production"
+            },
+            "fr": {
+              "browserTarget": "app:build:fr"
+            },
+            "es": {
+              "browserTarget": "app:build:es"
             },
             "ci": {
               "progress": false
