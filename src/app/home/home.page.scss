@@ -5,6 +5,14 @@
     justify-content: center;    
 }
 
+.leaflet-control-minimap {
+
+    @media (max-width: 480px) {
+        width: 60px;
+        height: 60px;
+    }
+}
+
 .control-buttons-container {
     position: absolute;
     display: flex;

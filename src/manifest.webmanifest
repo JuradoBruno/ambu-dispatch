@@ -1,11 +1,12 @@
 {
   "name": "AmbuDispatch",
-  "short_name": "ambudispatch",
+  "short_name": "AmbuDispatch",
   "theme_color": "#1976d2",
   "background_color": "#fafafa",
   "display": "fullscreen",
   "scope": "/",
   "start_url": "/",
+  "orientation": "landscape",
   "icons": [
     {
       "src": "assets/icons/logo.png",

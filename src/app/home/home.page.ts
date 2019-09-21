@@ -110,7 +110,7 @@ export class HomePage {
   }
 
   addMinimap() {
-    let rect1 = {color: "#ff1100", weight: 2};
+    let rect1 = {color: "#f04141", weight: 2};
     let rect2 = {color: "#0000AA", weight: 1, opacity:0, fillOpacity:0};
     
     let osm = new L.TileLayer(this.osmStreetMap)
@@ -122,8 +122,17 @@ export class HomePage {
       collapsedWidth: 50,
       collapsedHeight: 50,
       aimingRectOptions : rect1,
-      shadowRectOptions: rect2
+      shadowRectOptions: rect2,
+      height: 75,
+      width: 75
     }).addTo(this.map)
+    this.setMinimapStyles(miniMap._container.style)
+  }
+
+  setMinimapStyles (styles) {
+    styles.border = "2px solid #f04141"
+    styles.boxShadow = "8px 6px 8px -4px rgba(0,0,0,0.75)"
+    styles.borderRadius = "5px"
   }
 
   addRouting() {
@@ -147,11 +156,11 @@ export class HomePage {
   getTheTruckMoving(coords) {
     if (!this.firstMissionstarted) this.firstMissionstarted = true
     coords = [...route01Duration]
+    this.continueMission()
     this.disableMissionButton = true
     setTimeout(() => {
       this.disableMissionButton = false
     }, 5000);
-    this.missionIsRunning = true
 
     let marker = L.movingMarker([37.809185, -122.477351], {
       destinations: coords,
