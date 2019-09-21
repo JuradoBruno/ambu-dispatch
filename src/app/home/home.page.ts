@@ -126,6 +126,7 @@ export class HomePage {
 
   getTheTruckMoving(coords) {
     coords = route01Duration
+    this.disableMissionButton = true
 
     let marker = L.movingMarker([37.809185, -122.477351], {
       destinations: coords,
@@ -133,7 +134,6 @@ export class HomePage {
     });
 
     marker.on('start', function() {
-      this.disableMissionButton = true
     });
     marker.on('destination', function(destination) {
       // this.disableMissionButton = false
