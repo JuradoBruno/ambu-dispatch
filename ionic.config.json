@@ -1,6 +1,5 @@
 {
   "name": "ionic-app-base",
-  "app_id": "",
-  "type": "angular",
-  "integrations": {}
+  "integrations": {},
+  "type": "angular"
 }
