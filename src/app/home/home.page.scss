@@ -5,6 +5,16 @@
     justify-content: center;    
 }
 
+.control-buttons-container {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    bottom: 80px;
+    z-index: 2;
+    min-width: 300px;
+}
+
 .ambulance-side {
     box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
 }
@@ -15,6 +25,10 @@
     z-index: 2;
     height: 50px;
     width: 300px;
+}
+
+.control-button {
+    // margin: 5px;       
 }
 
 #map {

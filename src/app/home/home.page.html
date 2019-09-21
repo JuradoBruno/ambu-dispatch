@@ -8,7 +8,18 @@
         (leafletMapReady)="onMapAlmostReady($event)">        
     </div>
     
-    <ion-button color="danger" class="mission-button" (click)="getTheTruckMoving({})" [disabled]="disableMissionButton">Commencer la mission</ion-button>
+    <ion-button color="danger" class="mission-button" (click)="getTheTruckMoving({})" [disabled]="disableMissionButton">Transférer un patient</ion-button>
+    
+    <div class="control-buttons-container" *ngIf="firstMissionstarted">
+
+      <ion-button *ngIf="!missionIsRunning" color="danger" class="control-button" (click)="continueMission()">
+        <ion-icon name="play"></ion-icon>
+      </ion-button>
+
+      <ion-button *ngIf="missionIsRunning" color="danger" class="control-button" (click)="pauseMission()">
+        <ion-icon name="pause"></ion-icon>
+      </ion-button>
+    </div>
 
   </div>
 </ion-content>

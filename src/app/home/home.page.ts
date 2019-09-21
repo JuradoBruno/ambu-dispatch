@@ -14,16 +14,21 @@ import route01Duration from "../services/route01-duration.json"
 })
 export class HomePage {
 
+
   map
   osmStreetMap = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
   osmWiki = 'http://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png'
   osmAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 
+  movingMarkers = []
   disableMissionButton = false
+  firstMissionstarted = false
+  missionIsRunning = false
+  
 
   redAmbuIcon = {
     icon: L.icon({
-      iconSize: [90, 50],
+      iconSize: [75, 40],
       iconAnchor: [35, 41], // - margin-top, -margin-left
       iconUrl: 'assets/icon/ambulance-side-red.png',
       className: 'ambulance-side'
@@ -33,9 +38,9 @@ export class HomePage {
 
   hopitalIcon = {
     icon: L.icon({
-      iconSize: [80, 80],
+      iconSize: [73, 73],
       iconAnchor: [35, 41], // - margin-top, -margin-left
-      iconUrl: 'assets/icon/hopital-rond.png'
+      iconUrl: 'assets/icon/hopital-rond-strong.png'
     }
     )
   }
@@ -87,6 +92,21 @@ export class HomePage {
   onMapReady() {
     this.addMinimap()
     // this.addRouting()
+    this.addControls()
+  }
+  
+  addControls() {
+    // Controls
+  }
+
+  continueMission () {
+    this.missionIsRunning = true 
+    for (const marker of this.movingMarkers) marker.start()
+  }
+
+  pauseMission () {
+    this.missionIsRunning = false
+    for (const marker of this.movingMarkers) marker.pause()
   }
 
   addMinimap() {
@@ -107,38 +127,37 @@ export class HomePage {
   }
 
   addRouting() {
-    let control = L.Routing.control({
-      waypoints: [
-        L.latLng(43.609598, 1.401405),
-        L.latLng(43.601380, 1.433971)
-      ],
-      // router: new L.Routing.OSRMv1({
-      //   serviceUrl: 'http://router.project-osrm.org/'
-      // }),
-    }).addTo(this.map);
+    // let control = L.Routing.control({
+    //   waypoints: [
+    //     L.latLng(43.609598, 1.401405),
+    //     L.latLng(43.601380, 1.433971)
+    //   ],
+    //   // router: new L.Routing.OSRMv1({
+    //   //   serviceUrl: 'http://router.project-osrm.org/'
+    //   // }),
+    // }).addTo(this.map);
 
-    control.on('routeselected', event => {
-      let coords = event.route.coordinates;
-      let instr = event.route.instructions;
-      this.getTheTruckMoving(coords)
-    });
+    // control.on('routeselected', event => {
+    //   let coords = event.route.coordinates;
+    //   let instr = event.route.instructions;
+    //   this.getTheTruckMoving(coords)
+    // });
   }
 
   getTheTruckMoving(coords) {
-    coords = route01Duration
+    if (!this.firstMissionstarted) this.firstMissionstarted = true
+    coords = [...route01Duration]
     this.disableMissionButton = true
+    setTimeout(() => {
+      this.disableMissionButton = false
+    }, 5000);
+    this.missionIsRunning = true
 
     let marker = L.movingMarker([37.809185, -122.477351], {
       destinations: coords,
       icon: this.redAmbuIcon.icon
     });
-
-    marker.on('start', function() {
-    });
-    marker.on('destination', function(destination) {
-      // this.disableMissionButton = false
-    });
-  
+    this.movingMarkers.push(marker)
     marker.addTo(this.map);
   }
 
