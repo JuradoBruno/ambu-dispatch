@@ -5,11 +5,10 @@
     <div id="map"
         leaflet
         [leafletOptions]="mainMapOptions"
-        [leafletLayersControl]="layersControl"
         (leafletMapReady)="onMapAlmostReady($event)">        
     </div>
     
-    <ion-button class="mission-button" (click)="getTheTruckMoving({})" [disabled]="disableMissionButton">Commencer la mission</ion-button>
+    <ion-button color="danger" class="mission-button" (click)="getTheTruckMoving({})" [disabled]="disableMissionButton">Commencer la mission</ion-button>
 
   </div>
 </ion-content>
