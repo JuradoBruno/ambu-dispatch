@@ -16,6 +16,7 @@ export class HomePage {
 
 
   map
+  miniMap
   osmStreetMap = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
   osmWiki = 'http://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png'
   osmAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -79,6 +80,9 @@ export class HomePage {
   constructor() { }
 
   ngOnInit() {
+    window.addEventListener("orientationchange", () => {    
+      this.updateMarginBottomMinimap()
+    }, true);
   }
 
   onMapAlmostReady(map: L.Map) {
@@ -87,6 +91,7 @@ export class HomePage {
       map.invalidateSize()
       this.onMapReady()
     }, 0)
+    map.removeControl(map.zoomControl)
   }
 
   onMapReady() {
@@ -114,7 +119,7 @@ export class HomePage {
     let rect2 = {color: "#0000AA", weight: 1, opacity:0, fillOpacity:0};
     
     let osm = new L.TileLayer(this.osmStreetMap)
-    let miniMap = new MiniMap(osm, { 
+    this.miniMap = new MiniMap(osm, { 
       minZoom: 0, 
       maxZoom: 13, 
       toggleDisplay: true, 
@@ -123,16 +128,27 @@ export class HomePage {
       collapsedHeight: 50,
       aimingRectOptions : rect1,
       shadowRectOptions: rect2,
-      height: 75,
-      width: 75
+      height: 120,
+      width: 120
     }).addTo(this.map)
-    this.setMinimapStyles(miniMap._container.style)
+    this.setMinimapStyles(this.miniMap._container.style)
+    this.updateMarginBottomMinimap()
   }
 
   setMinimapStyles (styles) {
     styles.border = "2px solid #f04141"
     styles.boxShadow = "8px 6px 8px -4px rgba(0,0,0,0.75)"
     styles.borderRadius = "5px"
+    styles.borderRadius = "margin-bottom: 75px;"
+  }
+
+  updateMarginBottomMinimap() {
+    if (window.orientation === 0 && window.innerWidth < 900) {
+      this.miniMap._container.style.marginBottom = "75px"
+    }
+    if (window.orientation === 90) {
+      this.miniMap._container.style.marginBottom = "0px"
+    }
   }
 
   addRouting() {
