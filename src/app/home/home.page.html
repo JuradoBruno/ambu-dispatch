@@ -1,25 +1,35 @@
 
 <ion-content>
-  <div class="container">
-
-    <div id="map"
-        leaflet
-        [leafletOptions]="mainMapOptions"
-        (leafletMapReady)="onMapAlmostReady($event)">        
-    </div>
+  <div class="main-container">
+    <div class="map-container">
+  
+      <div leaflet
+          class="main-map"
+          [leafletOptions]="mainMapOptions"
+          (leafletMapReady)="onMapAlmostReady($event)">        
+      </div>
+  
+    </div> 
+  
+     <div class="interface-container">
+      
+      <div class="buttons-container">
+        <div class="control-buttons-container" *ngIf="firstMissionstarted">   
+          <ion-button *ngIf="!missionIsRunning" color="danger" class="control-button" (click)="continueMission()">
+            <ion-icon name="play"></ion-icon>
+          </ion-button>
     
-    <ion-button color="danger" class="mission-button" (click)="getTheTruckMoving({})" [disabled]="disableMissionButton">Transférer un patient</ion-button>
-    
-    <div class="control-buttons-container" *ngIf="firstMissionstarted">
-
-      <ion-button *ngIf="!missionIsRunning" color="danger" class="control-button" (click)="continueMission()">
-        <ion-icon name="play"></ion-icon>
-      </ion-button>
-
-      <ion-button *ngIf="missionIsRunning" color="danger" class="control-button" (click)="pauseMission()">
-        <ion-icon name="pause"></ion-icon>
-      </ion-button>
+          <ion-button *ngIf="missionIsRunning" color="danger" class="control-button" (click)="pauseMission()">
+            <ion-icon name="pause"></ion-icon>
+          </ion-button>
+        </div>
+ 
+        <ion-button color="danger" class="mission-button mission" (click)="getTheTruckMoving({})" [disabled]="disableMissionButton">Transférer un patient</ion-button>
+        <ion-button color="secondary" class="mission-button routing" (click)="addRouting()">Start routing</ion-button>
+      </div>
+       
+       
+  
     </div>
-
   </div>
 </ion-content>

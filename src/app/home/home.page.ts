@@ -2,7 +2,8 @@ import { Component } from '@angular/core';
 import * as L from 'leaflet';
 import MiniMap from 'leaflet-minimap';
 import 'leaflet-routing-machine';
-import "../services/moving-marker.service.ts"
+import 'leaflet-routing-machine-here';
+import '../services/moving-marker.service';
 // import "../services/AnimatedMarker.js"
 import route01 from "../services/route01.json"
 import route01Duration from "../services/route01-duration.json"
@@ -97,11 +98,6 @@ export class HomePage {
   onMapReady() {
     this.addMinimap()
     // this.addRouting()
-    this.addControls()
-  }
-  
-  addControls() {
-    // Controls
   }
 
   continueMission () {
@@ -152,21 +148,21 @@ export class HomePage {
   }
 
   addRouting() {
-    // let control = L.Routing.control({
-    //   waypoints: [
-    //     L.latLng(43.609598, 1.401405),
-    //     L.latLng(43.601380, 1.433971)
-    //   ],
-    //   // router: new L.Routing.OSRMv1({
-    //   //   serviceUrl: 'http://router.project-osrm.org/'
-    //   // }),
-    // }).addTo(this.map);
-
-    // control.on('routeselected', event => {
-    //   let coords = event.route.coordinates;
-    //   let instr = event.route.instructions;
-    //   this.getTheTruckMoving(coords)
-    // });
+    let control = L.Routing.control({
+      waypoints: [
+        L.latLng(43.609598, 1.401405),
+        L.latLng(43.601380, 1.433971)
+      ],
+      router: new L.Routing.Here('Wggb4j1DYHP72PKLC4Ij', 'VU2EFLLwNPnRdsGj06bBDw')
+    }).addTo(this.map)
+    console.log("TCL: HomePage -> addRouting -> control", control)
+    
+    control.on('routeselected', event => {
+      console.log("TCL: HomePage -> addRouting -> event", event)
+      let coords = event.route.coordinates;
+      let instr = event.route.instructions;
+      // this.getTheTruckMoving(coords)
+    });
   }
 
   getTheTruckMoving(coords) {
