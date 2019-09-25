@@ -5,7 +5,8 @@
   "homepage": "https://ionicframework.com/",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --configuration=hmr",
+    "start": "ng serve",
+    "start:hmr": "ng serve --configuration=hmr",
     "start:fr": "ng serve --configuration=fr",
     "start:es": "ng serve --configuration=es",
     "build": "ng build",

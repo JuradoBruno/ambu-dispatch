@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { AuthRoutingModule } from './auth-routing.module';
 import { AuthService } from '../core/services/auth.service';
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -10,6 +11,7 @@ import { AuthService } from '../core/services/auth.service';
   imports: [
     CommonModule,
     AuthRoutingModule,
+    ReactiveFormsModule,
   ],
   providers: [
     AuthService
