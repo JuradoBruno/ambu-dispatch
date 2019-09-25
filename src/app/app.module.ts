@@ -12,15 +12,19 @@ import { AppRoutingModule } from './app-routing.module';
 import { LeafletModule } from "@asymmetrik/ngx-leaflet";
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { CoreModule } from './core/core.module';
+import { AuthModule } from './auth/auth.module';
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
   imports: [
     BrowserModule, 
+    AuthModule,
     IonicModule.forRoot(), 
     AppRoutingModule,
     LeafletModule.forRoot(),
-    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
+    CoreModule
   ],
   providers: [
     StatusBar,
