@@ -4,15 +4,21 @@ import { AuthService } from './services/auth.service';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { GrowlerModule } from './growler/growler.module';
 import { EnsureModuleLoadedOnceGuard } from './ensure-module-loaded-once.guard';
+import { ModalModule } from './modal/modal.module';
 
 @NgModule({
   declarations: [],
   imports: [
-    CommonModule, HttpClientModule, GrowlerModule
+    CommonModule, 
+    HttpClientModule, 
+    GrowlerModule, 
+    ModalModule
   ],
   exports: [ 
+    HttpClientModule,
     GrowlerModule, 
-    HttpClientModule],
+    ModalModule
+  ],
   providers: [
     AuthService,
     HttpClient

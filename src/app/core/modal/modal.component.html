@@ -1,0 +1,18 @@
+<div class="flex vc hc full-view-size modal"
+    [ngClass]="{'fade-in': modalVisible}"
+    [ngStyle]="{'display': modalVisible ? 'flex' : 'none'}">
+    
+    <div class="flex hc p-rel d-col no-overflow b-rad-2">
+        <!-- Header -->
+        <div class="flex w-100 vc hc h-1 red-background">
+        <span class="header-title">{{ modalContent.header }}</span>
+        </div>
+
+        <!-- Form -->
+        <div class="flex hc d-col grey-background deep form-container">
+            <span class="input-title">{{ modalContent.body }}</span>
+            <button type="button" class="form-button-1 h-1 b-rad-1" (click)="cancel()" *ngIf="modalContent.cancelButtonVisible">{{ modalContent.cancelButtonText }}</button>
+            <button type="button" class="form-button-1 h-1 b-rad-1" (click)="ok()">{{ modalContent.OKButtonText }}</button>
+        </div>
+    </div>
+</div>

@@ -3,7 +3,7 @@ import { AuthService } from 'src/app/core/services/auth.service';
 import { ValidationService } from '../../core/services/validation.service';
 import { IUserSigninData } from 'src/app/shared/interfaces';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { GrowlerService, GrowlerMessageType } from '../../core/growler/growler.service';
+import { ModalService } from 'src/app/core/modal/modal.service';
 
 @Component({
   selector: 'app-signup',
@@ -16,7 +16,7 @@ export class SignupComponent implements OnInit {
 
   constructor(private authService: AuthService,
               private formBuilder: FormBuilder,
-              private growler: GrowlerService
+              private modal: ModalService
               ) {
               }
 
@@ -35,8 +35,12 @@ export class SignupComponent implements OnInit {
 
   signup() {
     if (!this.signupForm.valid) {
-      console.log("TCL: SignupComponent -> signup -> this.growler", this.growler)
-      this.growler.growl("Something is wrong!", GrowlerMessageType.Danger);
+      console.log("TCL: SignupComponent -> signup -> this.modal", this.modal)
+      this.modal.show({
+        header: 'Erreur',
+        body: 'Le formulaire n\'est pas correct',
+        cancelButtonVisible: false
+      })
       return
     }
     let userData: IUserSigninData = {
