@@ -28,6 +28,7 @@ export class AuthComponent implements OnInit {
     }
 
     if (componentToClose === 'signup') {
+      
       this.showSignup = false
     }
   }

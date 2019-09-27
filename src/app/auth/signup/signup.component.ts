@@ -36,7 +36,6 @@ export class SignupComponent implements OnInit {
 
   signup() {
     if (!this.signupForm.valid) {
-      console.log("TCL: SignupComponent -> signup -> this.modal", this.modal)
       this.modal.show({
         header: 'Erreur',
         body: 'Le formulaire n\'est pas correct',
