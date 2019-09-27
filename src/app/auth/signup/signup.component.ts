@@ -4,6 +4,7 @@ import { ValidationService } from '../../core/services/validation.service';
 import { IUserSigninData } from 'src/app/shared/interfaces';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ModalService } from 'src/app/core/modal/modal.service';
+import { ComponentsStateService, ComponentStateActions } from 'src/app/core/services/components-state.service';
 
 @Component({
   selector: 'bj-signup',
@@ -11,13 +12,13 @@ import { ModalService } from 'src/app/core/modal/modal.service';
   styleUrls: ['./signup.component.scss'],
 })
 export class SignupComponent implements OnInit {
-  @Output() closeComponent = new EventEmitter<string>()
   signupForm: FormGroup;
   errorMessage: string;
 
   constructor(private authService: AuthService,
               private formBuilder: FormBuilder,
-              private modal: ModalService
+              private modal: ModalService,
+              private componentStateService: ComponentsStateService
               ) {
               }
 
@@ -49,5 +50,9 @@ export class SignupComponent implements OnInit {
     }
     console.log("TCL: SignupComponent -> signup -> userData", userData)
     this.authService.signup(userData)
+  }
+
+  closeSelf() {
+    this.componentStateService.changeComponentState(ComponentStateActions.CloseSigninComponent)
   }
 }

@@ -5,6 +5,8 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { GrowlerModule } from './growler/growler.module';
 import { EnsureModuleLoadedOnceGuard } from './ensure-module-loaded-once.guard';
 import { ModalModule } from './modal/modal.module';
+import { ComponentsStateService } from './services/components-state.service';
+import { StateService } from './services/state.service';
 
 @NgModule({
   declarations: [],
@@ -21,7 +23,9 @@ import { ModalModule } from './modal/modal.module';
   ],
   providers: [
     AuthService,
-    HttpClient
+    HttpClient,
+    ComponentsStateService,
+    StateService
   ],
 })
 export class CoreModule extends EnsureModuleLoadedOnceGuard {

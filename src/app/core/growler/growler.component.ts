@@ -27,7 +27,6 @@ export class GrowlerComponent implements OnInit {
     // private logger: LoggerService
     ) {
     growlerService.growl = this.growl.bind(this);
-    console.log("TCL: GrowlerComponent -> growlerService", growlerService)
   }
 
   ngOnInit() { }

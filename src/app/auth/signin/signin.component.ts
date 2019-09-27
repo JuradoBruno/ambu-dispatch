@@ -6,6 +6,7 @@ import { ValidationService } from 'src/app/core/services/validation.service';
 import { Router } from '@angular/router';
 import { IUserSigninData } from 'src/app/shared/interfaces';
 import { take } from 'rxjs/operators';
+import { ComponentsStateService, ComponentStateActions } from 'src/app/core/services/components-state.service';
 
 @Component({
   selector: 'bj-signin',
@@ -13,16 +14,14 @@ import { take } from 'rxjs/operators';
   styleUrls: ['./signin.component.scss'],
 })
 export class SigninComponent implements OnInit {
-
-  @Output() closeComponent = new EventEmitter<string>();
-  @Output() openSignup = new EventEmitter()
   signinForm: FormGroup;
   errorMessage: string;
 
   constructor(private authService: AuthService,
               private formBuilder: FormBuilder,
               private modal: ModalService,
-              private router: Router
+              private router: Router,
+              private componentStateService: ComponentsStateService
               ) {
               }
 
@@ -30,6 +29,7 @@ export class SigninComponent implements OnInit {
     this.buildSigninForm()
   }
 
+  
   buildSigninForm() {
     this.signinForm = this.formBuilder.group({
       username: ['User3', [ Validators.required, Validators.minLength(3)]],
@@ -38,17 +38,15 @@ export class SigninComponent implements OnInit {
   }
 
   openSignupForm() {
-    console.log("TCL: SigninComponent -> openSignupForm -> openSignupForm")
-    this.openSignup.emit()
+    this.componentStateService.changeComponentState(ComponentStateActions.OpenSignupComponent)
   }
-
+  
   signin() {
-    console.log("TCL: SigninComponent -> signin -> signin")
     if (!this.signinForm.valid) { 
       this.showFormError()
       return
     }
-
+    
     let userData: IUserSigninData = {
       username: this.signinForm.value.username,
       password: this.signinForm.value.password
@@ -57,6 +55,7 @@ export class SigninComponent implements OnInit {
     this.authService.signin(userData).pipe(take(1)).subscribe((status: boolean) => {
       if (status) {
         // Display Success
+        this.componentStateService.changeComponentState(ComponentStateActions.CloseSignupComponent)
         this.router.navigate(['/home'])
       } else {
         console.log('Unable to login')
@@ -70,6 +69,10 @@ export class SigninComponent implements OnInit {
       body: 'Le formulaire n\'est pas correct',
       cancelButtonVisible: false
     })
+  }
+
+  closeSelf() {
+    this.componentStateService.changeComponentState(ComponentStateActions.CloseSigninComponent)
   }
 
 }
