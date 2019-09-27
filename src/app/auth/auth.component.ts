@@ -6,9 +6,30 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./auth.component.scss'],
 })
 export class AuthComponent implements OnInit {
-
+  
+  showSignin = false
+  showSignup = false
+  
   constructor() { }
 
   ngOnInit() {}
+
+  openSignin() {
+    this.showSignin = true
+  }
+
+  openSignup() {
+    this.showSignup = true
+  }
+
+  closeComponent(componentToClose) {
+    if (componentToClose === 'signin') {
+      this.showSignin = false
+    }
+
+    if (componentToClose === 'signup') {
+      this.showSignup = false
+    }
+  }
 
 }

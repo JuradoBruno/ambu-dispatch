@@ -79,11 +79,17 @@ $element-height: 35px;
     height: 35px;
 }
 
-
 .signup-button {
     width: 200px;
     height: $element-height;
     background-color: cornflowerblue;
+}
+
+.close-window-image {
+    position: absolute;
+    right: 10px;
+    width: 15px;
+    height: auto;
 }
 
 .form-container {
@@ -114,4 +120,18 @@ $element-height: 35px;
     width: 100px;
     margin: 10px 0px;
     background-color: $red-main;
+}
+
+.spacer {
+    &.w-10 {
+        width: 10px;
+    }
+    
+    &.w-15 {
+        width: 15px;
+    }
+    
+    &.w-20 {
+        width: 20px;
+    }
 }

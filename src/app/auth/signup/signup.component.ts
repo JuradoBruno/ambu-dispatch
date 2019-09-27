@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { ValidationService } from '../../core/services/validation.service';
 import { IUserSigninData } from 'src/app/shared/interfaces';
@@ -11,6 +11,7 @@ import { ModalService } from 'src/app/core/modal/modal.service';
   styleUrls: ['./signup.component.scss'],
 })
 export class SignupComponent implements OnInit {
+  @Output() closeComponent = new EventEmitter<string>()
   signupForm: FormGroup;
   errorMessage: string;
 
