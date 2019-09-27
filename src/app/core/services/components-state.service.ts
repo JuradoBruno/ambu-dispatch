@@ -7,7 +7,14 @@ import { of, Observable } from 'rxjs';
 export class ComponentsStateService extends ObservableStore<IStoreState> {
 
     constructor() {
-        super({ trackStateHistory: true})
+        super({ 
+            trackStateHistory: true,
+            stateSliceSelector: state => {
+                return {
+                    showSigninComponent: state.showSigninComponent,
+                    showSignupComponent: state.showSignupComponent,
+                }
+            }})
     }
 
     changeComponentState(action, value?) {
@@ -15,6 +22,7 @@ export class ComponentsStateService extends ObservableStore<IStoreState> {
             case ComponentStateActions.OpenSigninComponent:
                 this.setState({showSigninComponent: true}, ComponentStateActions.OpenSigninComponent)     
                 let state = this.getState()
+                console.log("TCL: ComponentsStateService -> changeComponentState -> state", state)
                 break;
             
             case ComponentStateActions.OpenSignupComponent:
@@ -32,14 +40,22 @@ export class ComponentsStateService extends ObservableStore<IStoreState> {
             default:
                 break;
         }
+        
+        console.log("TCL: ComponentsStateService -> changeComponentState -> this.stateHistory", this.stateHistory)
+    }
+
+    test(): Observable<any> {
+        let state = this.getState()
+        return of(state.showSigninComponent)
     }
 
     getComponentState(componentName): Observable<any> {
         let state = this.getState()
-        console.log("TCL: ComponentsStateService -> state", state)
-        if (!state) return
+        if (!state) throw "You must initialize the State before using it!";        
         switch (componentName) {
             case 'signin':
+                console.log("TCL: ComponentsStateService -> 'signin'", 'signin')
+                console.log("TCL: ComponentsStateService -> this", this)
                 return of(state.showSigninComponent)
 
             case 'signup':

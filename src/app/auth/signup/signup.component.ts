@@ -53,6 +53,6 @@ export class SignupComponent implements OnInit {
   }
 
   closeSelf() {
-    this.componentStateService.changeComponentState(ComponentStateActions.CloseSigninComponent)
+    this.componentStateService.changeComponentState(ComponentStateActions.CloseSignupComponent)
   }
 }

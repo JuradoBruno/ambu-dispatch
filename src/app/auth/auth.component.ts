@@ -2,6 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ComponentsStateService, ComponentStateActions } from '../core/services/components-state.service';
 import { Observable } from 'rxjs';
 import { SubSink } from 'subsink';
+import { map } from 'rxjs/operators';
+import { IStoreState } from '../shared/interfaces/store-state.interface';
 
 @Component({
   selector: 'app-auth',
@@ -13,24 +15,19 @@ export class AuthComponent implements OnInit, OnDestroy {
   subs = new SubSink()
   showSignin = false
   showSignup = false
+  
+  showSignin$: Observable<boolean>
 
   constructor(private componentsStateService: ComponentsStateService) { }
 
   ngOnInit() {
-    this.observeSignin()
-    this.observeSignup()
+    this.observeSigninAndSignupState()
   }
 
-  observeSignin() {
-    this.subs.sink = this.componentsStateService.getComponentState('signin').subscribe(value => {
-      console.log("TCL: AuthComponent -> observeSignin -> value", value)
-      this.showSignin = value
-    })
-  }
-
-  observeSignup() {
-    this.subs.sink = this.componentsStateService.getComponentState('signup').subscribe(value => {
-      this.showSignup = value
+  observeSigninAndSignupState() {    
+    this.subs.sink = this.componentsStateService.stateChanged.subscribe((state: IStoreState) => {
+      this.showSignin = state.showSigninComponent
+      this.showSignup = state.showSignupComponent
     })
   }
 
