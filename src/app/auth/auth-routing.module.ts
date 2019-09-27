@@ -1,10 +1,11 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { AuthComponent } from './auth.component';
 import { SignupComponent } from './signup/signup.component';
 
 
 const routes: Routes = [
-  { path: 'signup', component: SignupComponent},
+  { path: 'auth', component: AuthComponent},
 
 ];
 
@@ -13,5 +14,5 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class AuthRoutingModule { 
-  static components = [ SignupComponent ]
+  static components = [ AuthComponent, SignupComponent ]
  }

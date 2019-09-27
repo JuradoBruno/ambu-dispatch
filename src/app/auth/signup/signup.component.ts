@@ -6,7 +6,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ModalService } from 'src/app/core/modal/modal.service';
 
 @Component({
-  selector: 'app-signup',
+  selector: 'bj-signup',
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.scss'],
 })
