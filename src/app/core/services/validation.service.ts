@@ -38,7 +38,7 @@ export class ValidationService {
         // (?=.*[0-9])       - Assert a string has at least one number
         // (?!.*\s)          - Spaces are not allowed
         // tslint:disable-next-line
-        if (control.value.match(/^(?=.*\d)(?=.*[a-zA-Z!@#$%^&*])(?!.*\s).{6,100}$/)) {
+        if (control.value.match(/^(?=.*\d)(?=.*[a-zA-Z?!@#$%^&*])(?!.*\s).{6,150}$/)) {
             return null;
         } else {
             return { 'invalidPassword': true };

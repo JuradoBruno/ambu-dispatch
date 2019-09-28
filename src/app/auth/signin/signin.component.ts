@@ -22,7 +22,6 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
       })),
       state('hide', style({
         opacity: 0,
-        'pointer-events': 'none'
       })),
       transition('show => hide', animate('300ms ease-out')),
       transition('hide => show', animate('400ms ease-in'))
@@ -59,8 +58,8 @@ export class SigninComponent implements OnInit, OnDestroy {
 
   buildSigninForm() {
     this.signinForm = this.formBuilder.group({
-      username: ['User3', [Validators.required, Validators.minLength(3)]],
-      password: ['Bruno2605!', [Validators.required, ValidationService.passwordValidator]]
+      username: ['Almighty', [Validators.required, Validators.minLength(3)]],
+      password: ['syncmaster2605', [Validators.required, ValidationService.passwordValidator]]
     })
   }
 
@@ -87,14 +86,6 @@ export class SigninComponent implements OnInit, OnDestroy {
       this.componentsStateService.changeComponentState(ComponentStateActions.CloseSigninComponent)
       this.router.navigate(['/home'])
     })
-
-    // this.authService.signin(userData).pipe(take(1)).subscribe((status: boolean) => {
-    //   if (status) {
-    //     // Display Success
-    //   } else {
-    //     console.log('Unable to login')
-    //   }
-    // })
   }
 
   showFormError() {

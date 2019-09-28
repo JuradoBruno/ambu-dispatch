@@ -2,6 +2,10 @@
 
 
 $element-height: 35px;
+.disabled-1 {
+    pointer-events: none;
+    opacity: 0.6;
+}
 
 .dimmed-background {
     background: rgba(0, 0, 0, 0.6);
@@ -13,6 +17,10 @@ $element-height: 35px;
 
 .modal {
     z-index: 999;
+}
+
+.red-border-1 {
+    border: solid 3px $red-main;
 }
 
 .flex {
@@ -100,6 +108,7 @@ $element-height: 35px;
 }
 
 .form-container {
+    padding: 10px;
     width: 350px;
 }
 

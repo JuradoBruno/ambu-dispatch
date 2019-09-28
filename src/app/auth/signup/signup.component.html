@@ -10,18 +10,26 @@
     <!-- Form -->
     <form [formGroup]="signupForm" (ngSubmit)="signup()" class="flex hc d-col grey-background deep form-container">
       <span class="input-title">Identifiant</span>
-      <input formControlName="username" autocomplete="username" class="form-input-1 h-1" type="text">
-
+      <input formControlName="username" autocomplete="username" class="form-input-1 h-1 b-rad-1" type="text"
+      placeholder="Au moins 3 charactères"
+      [ngClass]="{'red-border-1': signupForm.controls.username.invalid && signupForm.controls.username.touched}">
+      
       <span class="input-title">Mot de passe</span>
-      <input formControlName="password" autocomplete="new-password" class="form-input-1 h-1" type="password">
+      <input formControlName="password" autocomplete="new-password" class="form-input-1 h-1 b-rad-1" 
+      [ngClass]="{'red-border-1': signupForm.controls.password.invalid && signupForm.controls.password.touched}"
+      type="password" placeholder="Doit contenir un chiffre">
 
       <span class="input-title">Confirmation</span>
-      <input formControlName="passwordControl" autocomplete="new-password" class="form-input-1 h-1" type="password">
+      <input formControlName="passwordConfirm" autocomplete="new-password" class="form-input-1 h-1 b-rad-1" type="password"
+      [ngClass]="{'red-border-1': (signupForm.hasError('passwordsDontMatch') || signupForm.controls.password.invalid)
+      && signupForm.controls.passwordConfirm.touched}">
 
       <span class="input-title">Email</span>
-      <input formControlName="email" class="form-input-1 h-1 b-rad-1" type="email">
+      <input formControlName="email" class="form-input-1 h-1 b-rad-1" type="email"
+      [ngClass]="{'red-border-1': signupForm.controls.email.invalid && signupForm.controls.email.touched}">
 
-      <button type="sumbit" class="form-button-1 h-1 b-rad-1">Valider</button>
+      <button type="sumbit" class="form-button-1 h-1 b-rad-1" 
+        [ngClass]="{'disabled-1': !signupForm.valid}">Valider</button>
     </form>
 
   </div>

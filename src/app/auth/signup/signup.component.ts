@@ -15,18 +15,17 @@ import { IStoreState } from 'src/app/shared/interfaces/store-state.interface';
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.scss'],
   animations: [
-    trigger('fade', 
-    [
-      state('show', style({
-        opacity: 1
-      })),
-      state('hide', style({
-        opacity: 0,
-        'pointer-events': 'none'
-      })),
-      transition('show => hide', animate('300ms ease-out')),
-      transition('hide => show', animate('400ms ease-in'))
-    ]
+    trigger('fade',
+      [
+        state('show', style({
+          opacity: 1
+        })),
+        state('hide', style({
+          opacity: 0,
+        })),
+        transition('show => hide', animate('150ms ease-out')),
+        transition('hide => show', animate('150ms ease-in'))
+      ]
     )
   ]
 })
@@ -66,14 +65,24 @@ export class SignupComponent implements OnInit {
   buildSignupForm() {
     let date = Date.now()
     this.signupForm = this.formBuilder.group({
-      username: [`Bruno${date}`, [Validators.required, Validators.minLength(3)]],
-      password: ['Bruno2606!', [Validators.required, ValidationService.passwordValidator]],
-      passwordControl: ['Bruno2606!', [Validators.required, ValidationService.passwordValidator]],
-      email: ['jurado.bruno@gmail.com', [Validators.required, ValidationService.emailValidator]],
-    })
+      username: ['', [Validators.required, Validators.minLength(3)]],
+      password: ['', [Validators.required, ValidationService.passwordValidator]],
+      passwordConfirm: ['', [Validators.required, ValidationService.passwordValidator]],
+      email: ['', [Validators.required, ValidationService.emailValidator]],
+    }, { validator: this.checkPasswords })
+  }
+
+  checkPasswords(group: FormGroup) { // here we have the 'passwords' group
+    let password = group.controls.password.value;
+    let confirmPass = group.controls.passwordConfirm.value;
+
+    if (password === confirmPass) return null
+
+    return { passwordsDontMatch: true }
   }
 
   signup() {
+    console.log("TCL: SignupComponent -> signup -> this.signupForm", this.signupForm)
     if (!this.signupForm.valid) {
       this.showFormError('Le formulaire n\'est pas correct')
       return
