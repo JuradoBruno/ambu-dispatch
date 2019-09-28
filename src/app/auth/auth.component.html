@@ -1,4 +1,4 @@
-<div class="ambu-background flex hc full-view-size d-col">
+<div class="ambu-background flex hc vc full-view-size d-col">
   <img class="ambu-text" src="assets/img/ambudispatch-text.png" alt="">
   
   <div class="flex vc hc d-col h-100 w-100">
@@ -8,7 +8,8 @@
     
     <div class="btn btn-2 btn-2h red" (click)="openSignin()">SE CONNECTER</div>
   </div>
-  <div class="dimmed-background p-abs full-view-size no-click" *ngIf="showSignin || showSignup"></div>
-  <bj-signin class="signin-container fade-in" *ngIf="showSignin"></bj-signin>
-  <bj-signup class="signin-container fade-in" *ngIf="showSignup"></bj-signup>
+  <!-- <div class="dimmed-background p-abs full-view-size" [@fade]="stateName"></div> -->
+
+  <bj-signin class="p-abs" [ngClass]="{'no-click': !showSignin}"></bj-signin>
+  <bj-signup class="p-abs" [ngClass]="{'no-click': !showSignup}"></bj-signup>
 </div>

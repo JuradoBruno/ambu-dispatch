@@ -1,16 +1,16 @@
-<div class="flex hc p-rel d-col no-overflow b-rad-2">
-  <!-- Header -->
-  <div class="flex w-100 vc hc h-1 red-background">
-    <span class="header-title">Connection</span>
-    <img src="assets/icon/close-white.png" alt="Close the window" class="close-window-image" (click)="closeSelf()">
-  </div>
-  
-  <!-- Form -->
-  <form [formGroup]="signinForm" (ngSubmit)="signin()" 
-  class="flex hc d-col grey-background deep form-container">
-      <span class="input-title" >Identifiant</span>
+<div class="flex vc hc full-view-size dimmed-background" [@fade]="stateName">
+  <div class="flex hc p-rel d-col no-overflow b-rad-2">
+    <!-- Header -->
+    <div class="flex w-100 vc hc h-1 red-background">
+      <span class="header-title">Connection</span>
+      <img src="assets/icon/close-white.png" alt="Close the window" class="close-window-image" (click)="closeSelf()">
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="signinForm" (ngSubmit)="signin()" class="flex hc d-col grey-background deep form-container">
+      <span class="input-title">Identifiant</span>
       <input formControlName="username" autocomplete="username" class="form-input-1 h-1" type="text">
-      
+
       <span class="input-title">Mot de passe</span>
       <input formControlName="password" autocomplete="current-password" class="form-input-1 h-1" type="password">
 
@@ -20,4 +20,5 @@
         <button type="button" (click)="signin()" class="form-button-1 h-1 b-rad-1">Connection</button>
       </div>
     </form>
+  </div>
 </div>

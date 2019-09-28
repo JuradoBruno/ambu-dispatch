@@ -1,25 +1,28 @@
-<div class="flex hc p-rel d-col no-overflow b-rad-2">
-  <!-- Header -->
-  <div class="flex w-100 vc hc h-1 red-background">
-    <span class="header-title">Inscription</span>
-    <img src="assets/icon/close-white.png" alt="Close the window" class="close-window-image" (click)="closeSelf()">
+<div class="flex vc hc full-view-size" 
+  [ngClass]="{'dimmed-background': showDimmedBackground}"[@fade]="stateName">
+  <div class="flex hc p-rel d-col no-overflow b-rad-2">
+    <!-- Header -->
+    <div class="flex w-100 vc hc h-1 red-background">
+      <span class="header-title">Inscription</span>
+      <img src="assets/icon/close-white.png" alt="Close the window" class="close-window-image" (click)="closeSelf()">
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="signupForm" (ngSubmit)="signup()" class="flex hc d-col grey-background deep form-container">
+      <span class="input-title">Identifiant</span>
+      <input formControlName="username" autocomplete="username" class="form-input-1 h-1" type="text">
+
+      <span class="input-title">Mot de passe</span>
+      <input formControlName="password" autocomplete="new-password" class="form-input-1 h-1" type="password">
+
+      <span class="input-title">Confirmation</span>
+      <input formControlName="passwordControl" autocomplete="new-password" class="form-input-1 h-1" type="password">
+
+      <span class="input-title">Email</span>
+      <input formControlName="email" class="form-input-1 h-1 b-rad-1" type="email">
+
+      <button type="sumbit" class="form-button-1 h-1 b-rad-1">Valider</button>
+    </form>
+
   </div>
-
-  <!-- Form -->
-  <form [formGroup]="signupForm" (ngSubmit)="signup()" class="flex hc d-col grey-background deep form-container">
-    <span class="input-title">Identifiant</span>
-    <input formControlName="username" autocomplete="username" class="form-input-1 h-1" type="text">
-
-    <span class="input-title">Mot de passe</span>
-    <input formControlName="password" autocomplete="new-password" class="form-input-1 h-1" type="password">
-
-    <span class="input-title">Confirmation</span>
-    <input formControlName="passwordControl" autocomplete="new-password" class="form-input-1 h-1" type="password">
-
-    <span class="input-title">Email</span>
-    <input formControlName="email" class="form-input-1 h-1 b-rad-1" type="email">
-
-    <button type="sumbit" class="form-button-1 h-1 b-rad-1">Inscription</button>
-  </form>
-
 </div>
