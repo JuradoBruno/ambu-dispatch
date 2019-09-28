@@ -1,7 +1,7 @@
 import { Injectable, Output, EventEmitter } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { map, take, catchError } from 'rxjs/operators';
-import { IUserSigninData, IAuthToken } from 'src/app/shared/interfaces';
+import { IUserSigninData, IAuthToken, IUserSignupData } from 'src/app/shared/interfaces';
 import { Observable } from 'rxjs';
 import { ObservableStore } from '@codewithdan/observable-store';
 import { IStoreState } from 'src/app/shared/interfaces/store-state.interface';
@@ -32,20 +32,13 @@ export class AuthService extends ObservableStore<IStoreState>{
       // this.baseHttpService.saveToken(response.accessToken)
       return true
     }).catch(error => {
-      console.log("TCL: AuthService -> error", error)
       if (error.status == 401) return false
       console.error(error)
     })
   }
 
-  signup(userData: IUserSigninData): Observable<boolean> {
-    return this.http.post<any>(this.authUrl + '/signup', userData).pipe(
-      map((result: any) => {
-        console.log("TCL: AuthService -> constructor -> result", result)
-        return true
-      }),
-      catchError(this.handleError)
-    )
+  signup(userData: IUserSignupData): Promise<boolean> {
+    return this.http.post<any>(this.authUrl + '/signup', userData).toPromise()
   }
 
   private handleError(error: HttpErrorResponse) {

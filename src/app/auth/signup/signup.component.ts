@@ -3,13 +3,14 @@ import { AuthService } from 'src/app/core/services/auth.service';
 import { ValidationService } from '../../core/services/validation.service';
 import { IUserSigninData } from 'src/app/shared/interfaces';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ModalService } from 'src/app/core/modal/modal.service';
 import { ComponentsStateService, ComponentStateActions } from 'src/app/core/services/components-state.service';
 
 @Component({
   selector: 'bj-signup',
   templateUrl: './signup.component.html',
-  styleUrls: ['./signup.component.scss'],
+  styleUrls: ['./signup.component.scss']
 })
 export class SignupComponent implements OnInit {
   signupForm: FormGroup;
@@ -18,7 +19,8 @@ export class SignupComponent implements OnInit {
   constructor(private authService: AuthService,
               private formBuilder: FormBuilder,
               private modal: ModalService,
-              private componentStateService: ComponentsStateService
+              private componentStateService: ComponentsStateService,
+              private router: Router
               ) {
               }
 
@@ -27,29 +29,35 @@ export class SignupComponent implements OnInit {
   }
 
   buildSignupForm() {
+    let date = Date.now()
     this.signupForm = this.formBuilder.group({
-      username: ['', [ Validators.required, Validators.minLength(3)]],
-      password: ['', [ Validators.required, ValidationService.passwordValidator]],
-      passwordControl: ['', [ Validators.required, ValidationService.passwordValidator]],
-      email: ['', [ Validators.required, ValidationService.emailValidator]],
+      username: [`Bruno${date}`, [ Validators.required, Validators.minLength(3)]],
+      password: ['Bruno2606!', [ Validators.required, ValidationService.passwordValidator]],
+      passwordControl: ['Bruno2606!', [ Validators.required, ValidationService.passwordValidator]],
+      email: ['jurado.bruno@gmail.com', [ Validators.required, ValidationService.emailValidator]],
     }) 
   }
 
   signup() {
     if (!this.signupForm.valid) {
-      this.modal.show({
-        header: 'Erreur',
-        body: 'Le formulaire n\'est pas correct',
-        cancelButtonVisible: false
-      })
+      this.showFormError('Le formulaire n\'est pas correct')
       return
     }
-    let userData: IUserSigninData = {
-      username: this.signupForm.value.username,
-      password: this.signupForm.value.password
-    }
-    console.log("TCL: SignupComponent -> signup -> userData", userData)
-    this.authService.signup(userData)
+    let {username, password, email} = this.signupForm.value
+    this.authService.signup({username, password, email}).then(itWorked => {
+      this.closeSelf()
+      this.router.navigate(['/home'])
+    }).catch(error => {
+      this.showFormError(error.message)
+    })
+  }
+
+  showFormError(body) {
+    this.modal.show({
+      header: 'Erreur',
+      body: body,
+      cancelButtonVisible: false
+    })
   }
 
   closeSelf() {
