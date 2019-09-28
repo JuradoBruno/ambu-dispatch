@@ -3,38 +3,43 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { map, take, catchError } from 'rxjs/operators';
 import { IUserSigninData, IAuthToken } from 'src/app/shared/interfaces';
 import { Observable } from 'rxjs';
+import { ObservableStore } from '@codewithdan/observable-store';
+import { IStoreState } from 'src/app/shared/interfaces/store-state.interface';
+import { BaseHttpService } from './base-http.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService {
+export class AuthService extends ObservableStore<IStoreState>{
 
   baseUrl = 'http://localhost:3000' // Get that from .env
   authUrl = this.baseUrl + '/auth'
   isAuthenticated = false;
   @Output() authChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-  constructor(private http: HttpClient) { }
-  
-  private userAuthChanged(status: boolean) {
-    this.authChanged.emit(status); // Raise changed event
+  constructor(
+    private http: HttpClient,
+    private baseHttpService: BaseHttpService
+  ) {
+    super({
+      trackStateHistory: false
+    })
   }
 
-  signin(userData: IUserSigninData): Observable<boolean> {    
-    return this.http.post<any>( this.authUrl + '/signin', userData).pipe(
-      map((authToken: IAuthToken) => {
-        console.log("TCL: AuthService -> constructor -> authToken", authToken)
-        localStorage.setItem('jwt', authToken.accessToken)
-        this.isAuthenticated = true
-        this.userAuthChanged(this.isAuthenticated);
-        return this.isAuthenticated
-      }),
-      catchError(this.handleError)
-    )
+  signin(userData: IUserSigninData): Promise<boolean> {
+    return this.http.post<any>(this.authUrl + '/signin', userData).toPromise().then((response: IAuthToken) => {
+      if (!response.accessToken) return false // Wrong data incoming
+      // this.baseHttpService.saveToken(response.accessToken)
+      return true
+    }).catch(error => {
+      console.log("TCL: AuthService -> error", error)
+      if (error.status == 401) return false
+      console.error(error)
+    })
   }
 
   signup(userData: IUserSigninData): Observable<boolean> {
-    return this.http.post<any>( this.authUrl + '/signup', userData).pipe(
+    return this.http.post<any>(this.authUrl + '/signup', userData).pipe(
       map((result: any) => {
         console.log("TCL: AuthService -> constructor -> result", result)
         return true
@@ -52,5 +57,5 @@ export class AuthService {
       // return Observable.throw(err.text() || 'backend server error');
     }
     return Observable.throw(error || 'Server error');
-}
+  }
 }

@@ -7,6 +7,7 @@ import { EnsureModuleLoadedOnceGuard } from './ensure-module-loaded-once.guard';
 import { ModalModule } from './modal/modal.module';
 import { ComponentsStateService } from './services/components-state.service';
 import { StateService } from './services/state.service';
+import { BaseHttpService } from './services/base-http.service';
 
 @NgModule({
   declarations: [],
@@ -25,7 +26,8 @@ import { StateService } from './services/state.service';
     AuthService,
     HttpClient,
     ComponentsStateService,
-    StateService
+    StateService,
+    BaseHttpService
   ],
 })
 export class CoreModule extends EnsureModuleLoadedOnceGuard {

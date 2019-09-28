@@ -52,21 +52,28 @@ export class SigninComponent implements OnInit {
       password: this.signinForm.value.password
     }
 
-    this.authService.signin(userData).pipe(take(1)).subscribe((status: boolean) => {
-      if (status) {
-        // Display Success
-        this.componentStateService.changeComponentState(ComponentStateActions.CloseSignupComponent)
-        this.router.navigate(['/home'])
-      } else {
-        console.log('Unable to login')
+    this.authService.signin(userData).then(isLoggedIn => {
+      if (!isLoggedIn){
+        this.showFormError()
+        return
       }
+      this.componentStateService.changeComponentState(ComponentStateActions.CloseSigninComponent)
+      this.router.navigate(['/home'])
     })
+
+    // this.authService.signin(userData).pipe(take(1)).subscribe((status: boolean) => {
+    //   if (status) {
+    //     // Display Success
+    //   } else {
+    //     console.log('Unable to login')
+    //   }
+    // })
   }
 
   showFormError() {
     this.modal.show({
       header: 'Erreur',
-      body: 'Le formulaire n\'est pas correct',
+      body: 'Identifiants invalides',
       cancelButtonVisible: false
     })
   }
