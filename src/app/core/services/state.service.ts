@@ -5,6 +5,7 @@ import { ObservableStore } from '@codewithdan/observable-store';
 @Injectable()
 export class StateService extends ObservableStore<IStoreState>  {
     initialState: IStoreState = {
+        accessToken: null,
         showSignupComponent: false,
         showSigninComponent: false,
         user: {}
