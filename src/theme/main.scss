@@ -3,8 +3,15 @@
 
 $element-height: 35px;
 
+.dimmed-background {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.no-click {
+    pointer-events: none;
+}
+
 .modal {
-    background: rgba(0,0,0,0.6);
     z-index: 999;
 }
 

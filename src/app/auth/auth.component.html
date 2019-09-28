@@ -1,13 +1,14 @@
 <div class="ambu-background flex hc full-view-size d-col">
-  <bj-signin class="signin-container" *ngIf="showSignin"></bj-signin>
-  <bj-signup class="signin-container" *ngIf="showSignup"></bj-signup>
   <img class="ambu-text" src="assets/img/ambudispatch-text.png" alt="">
-
+  
   <div class="flex vc hc d-col h-100 w-100">
     <div class="btn btn-2 btn-2h orange">JOUER</div>
-
+    
     <div *ngIf="showSignin$ | async" class="btn btn-2 btn-2h orange">TEST</div>
     
     <div class="btn btn-2 btn-2h red" (click)="openSignin()">SE CONNECTER</div>
   </div>
+  <div class="dimmed-background p-abs full-view-size no-click" *ngIf="showSignin || showSignup"></div>
+  <bj-signin class="signin-container fade-in" *ngIf="showSignin"></bj-signin>
+  <bj-signup class="signin-container fade-in" *ngIf="showSignup"></bj-signup>
 </div>
