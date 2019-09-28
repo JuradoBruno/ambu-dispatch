@@ -31,6 +31,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 export class SigninComponent implements OnInit, OnDestroy {
   subs = new SubSink()
   show = false
+  savedUsername = ''
   signinForm: FormGroup;
   errorMessage: string;
 
@@ -46,6 +47,7 @@ export class SigninComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
+    this.savedUsername = this.authService.getUsername()
     this.buildSigninForm()
     this.observeSelf()
   }
@@ -58,8 +60,8 @@ export class SigninComponent implements OnInit, OnDestroy {
 
   buildSigninForm() {
     this.signinForm = this.formBuilder.group({
-      username: ['Almighty', [Validators.required, Validators.minLength(3)]],
-      password: ['syncmaster2605', [Validators.required, ValidationService.passwordValidator]]
+      username: [this.savedUsername, [Validators.required, Validators.minLength(3)]],
+      password: ['', [Validators.required, ValidationService.passwordValidator]]
     })
   }
 
@@ -83,6 +85,8 @@ export class SigninComponent implements OnInit, OnDestroy {
         this.showFormError()
         return
       }
+      // We are signed In
+      this.authService.saveUsername(userData.username)
       this.componentsStateService.changeComponentState(ComponentStateActions.CloseSigninComponent)
       this.router.navigate(['/home'])
     })

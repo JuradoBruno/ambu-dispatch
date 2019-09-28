@@ -56,7 +56,6 @@ L.AnimatedMarker = L.Marker.extend({
   },
 
   animate: function() {
-  console.log("TCL: animate")
     var self = this,
         len = this._latlngs.length,
         speed = this.options.interval;

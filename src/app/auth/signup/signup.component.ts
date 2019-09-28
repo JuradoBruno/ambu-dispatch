@@ -56,7 +56,6 @@ export class SignupComponent implements OnInit {
 
   observeSelf() {
     this.subs.sink = this.componentsStateService.globalStateChanged.subscribe((state: IStoreState) => {
-      console.log("TCL: SignupComponent -> observeSelf -> state.showSigninComponent", state.showSigninComponent)
       this.show = state.showSignupComponent
       this.showDimmedBackground = !state.showSigninComponent // Signin already has one
     })
@@ -82,7 +81,6 @@ export class SignupComponent implements OnInit {
   }
 
   signup() {
-    console.log("TCL: SignupComponent -> signup -> this.signupForm", this.signupForm)
     if (!this.signupForm.valid) {
       this.showFormError('Le formulaire n\'est pas correct')
       return

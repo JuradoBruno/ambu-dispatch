@@ -17,7 +17,6 @@ export class AppComponent {
     private statusBar: StatusBar,
     private stateService: StateService
   ) {
-    console.log('APP COMPONENT CONSTRUCTOR')
     this.initializeApp();
   }
 

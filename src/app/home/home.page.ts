@@ -7,6 +7,8 @@ import '../services/moving-marker.service';
 // import "../services/AnimatedMarker.js"
 import route01 from "../services/route01.json"
 import route01Duration from "../services/route01-duration.json"
+import { Router } from '@angular/router';
+import { AuthService } from '../core/services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -14,8 +16,6 @@ import route01Duration from "../services/route01-duration.json"
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
-
-
   map
   miniMap
   osmStreetMap = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
@@ -78,7 +78,9 @@ export class HomePage {
   };
   layersControlOptions: L.ControlOptions = { position: 'bottomright' };
 
-  constructor() { }
+  constructor( 
+    private router: Router,
+    private authService: AuthService) {}
 
   ngOnInit() {
     window.addEventListener("orientationchange", () => {    
@@ -155,10 +157,8 @@ export class HomePage {
       ],
       router: new L.Routing.Here('Wggb4j1DYHP72PKLC4Ij', 'VU2EFLLwNPnRdsGj06bBDw')
     }).addTo(this.map)
-    console.log("TCL: HomePage -> addRouting -> control", control)
     
     control.on('routeselected', event => {
-      console.log("TCL: HomePage -> addRouting -> event", event)
       let coords = event.route.coordinates;
       let instr = event.route.instructions;
       // this.getTheTruckMoving(coords)
@@ -182,6 +182,8 @@ export class HomePage {
     marker.addTo(this.map);
   }
 
-
-
+  signout() {
+    this.router.navigate(['/auth'])
+    this.authService.signout()
+  }
 }

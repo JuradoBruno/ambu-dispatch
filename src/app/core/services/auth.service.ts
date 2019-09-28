@@ -1,5 +1,5 @@
 import { Injectable, Output, EventEmitter } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { map, take, catchError } from 'rxjs/operators';
 import { IUserSigninData, IAuthToken, IUserSignupData } from 'src/app/shared/interfaces';
 import { Observable } from 'rxjs';
@@ -11,7 +11,6 @@ import { BaseHttpService } from './base-http.service';
   providedIn: 'root'
 })
 export class AuthService extends ObservableStore<IStoreState>{
-
   baseUrl = 'http://localhost:3000' // Get that from .env
   authUrl = this.baseUrl + '/auth'
   isAuthenticated = false;
@@ -26,10 +25,21 @@ export class AuthService extends ObservableStore<IStoreState>{
     })
   }
 
+  getUsername() {
+    let username = localStorage.getItem('username')
+    if (!username) return ''
+    return username
+  }
+
+  saveUsername(username: string) {
+    // TODO: SAVE IN THE STATE
+    localStorage.setItem('username', username)
+  }
+
   signin(userData: IUserSigninData): Promise<boolean> {
     return this.http.post<any>(this.authUrl + '/signin', userData).toPromise().then((response: IAuthToken) => {
       if (!response.accessToken) return false // Wrong data incoming
-      // this.baseHttpService.saveToken(response.accessToken)
+      this.baseHttpService.saveToken(response.accessToken)
       return true
     }).catch(error => {
       if (error.status == 401) return false
@@ -41,6 +51,22 @@ export class AuthService extends ObservableStore<IStoreState>{
     return this.http.post<any>(this.authUrl + '/signup', userData).toPromise()
   }
 
+  signout() {
+    localStorage.removeItem('accessToken')
+  }
+
+
+  // POST with header EXAMPLE!
+  // @@@@@@@@@@@@
+  getUserTasks():Promise<boolean> {
+    let headers = this.baseHttpService.returnHeaders()
+    return this.http.post<any>(this.authUrl + '/test', {}, {headers}).toPromise().then(tasks => {
+      return tasks
+    }).catch(error => {
+    })
+  }
+  // @@@@@@@@@@@@
+
   private handleError(error: HttpErrorResponse) {
     console.error('server error:', error);
     if (error.error instanceof Error) {
@@ -50,5 +76,11 @@ export class AuthService extends ObservableStore<IStoreState>{
       // return Observable.throw(err.text() || 'backend server error');
     }
     return Observable.throw(error || 'Server error');
+  }
+
+  checkIfUserIsSignedIn() {
+    let token = this.baseHttpService.getTokenFromStorage()
+    
+    return token? true : false
   }
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ObservableStore } from '@codewithdan/observable-store';
 import { IStoreState } from 'src/app/shared/interfaces/store-state.interface';
+import { HttpHeaders } from '@angular/common/http';
 
 @Injectable()
 export class BaseHttpService extends ObservableStore<IStoreState> {
@@ -20,26 +21,18 @@ export class BaseHttpService extends ObservableStore<IStoreState> {
         this.setState(this.initialState, BaseHttpActions.InitState)
     }
 
-    returnRequestOptions() {
-        let { accessToken } = this.getState()
-        if (!accessToken) accessToken = this.loadToken()
-
-        return {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-        };
-    }
-
     saveToken(accessToken) {
-        this.setState({ accessToken }, BaseHttpActions.SaveToken)
         localStorage.setItem('accessToken', accessToken);
     }
 
-    loadToken(): string {
-        const accessToken = localStorage.getItem('accessToken');
-        this.saveToken(accessToken)
-        return accessToken
+    getTokenFromStorage() {
+        return localStorage.getItem('accessToken')
+    }
+
+    returnHeaders() {
+        let token = this.getTokenFromStorage()
+        const headers = new HttpHeaders().set("Authorization", `Bearer ${token}`)
+        return headers
     }
 }
 
