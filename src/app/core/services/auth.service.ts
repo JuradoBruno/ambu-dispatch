@@ -11,7 +11,8 @@ import { BaseHttpService } from './base-http.service';
   providedIn: 'root'
 })
 export class AuthService extends ObservableStore<IStoreState>{
-  baseUrl = 'http://localhost:3000' // Get that from .env
+  baseUrl = 'https://ambu-dispatch-recette.eu-west-1.elasticbeanstalk.com' // Get that from .env
+  // baseUrl = 'http://localhost:3000' // Get that from .env
   authUrl = this.baseUrl + '/auth'
   isAuthenticated = false;
   @Output() authChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
