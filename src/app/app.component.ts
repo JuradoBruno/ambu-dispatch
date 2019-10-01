@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-
 import { Platform } from '@ionic/angular';
+import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { StateService } from './core/services/state.service';
@@ -15,6 +15,7 @@ export class AppComponent {
     private platform: Platform,
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
+    private screenOrientation: ScreenOrientation,
     private stateService: StateService
   ) {
     this.initializeApp();
@@ -22,9 +23,18 @@ export class AppComponent {
 
   initializeApp() {
     this.platform.ready().then(() => {
-      this.statusBar.styleDefault();
+      this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.LANDSCAPE).catch(err => {
+        console.error(err)
+      })
+      this.statusBar.hide();
       this.splashScreen.hide();
+
+      // this.androidFullScreen.isImmersiveModeSupported().then(() => {
+      //   this.androidFullScreen.immersiveMode()
+      // }).catch(err => {
+      //   console.error(err)
+      // })
     });
-    this.stateService.InitializeState();
+    this.stateService.InitializeState(); // Can be removed?
   }
 }

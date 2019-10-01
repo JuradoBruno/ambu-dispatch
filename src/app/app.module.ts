@@ -9,6 +9,7 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
+import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
 
 import { LeafletModule } from "@asymmetrik/ngx-leaflet";
 import { ServiceWorkerModule } from '@angular/service-worker';
@@ -31,6 +32,7 @@ import { AuthModule } from './auth/auth.module';
   providers: [
     StatusBar,
     SplashScreen,
+    ScreenOrientation,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]
