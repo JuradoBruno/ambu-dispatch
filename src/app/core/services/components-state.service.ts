@@ -66,13 +66,13 @@ export class ComponentsStateService extends ObservableStore<IStoreState> {
 
 
 export enum ComponentStateActions {
-    InitState = '[COMPO STATE] INITIALIZE COMPONENT STATE',
+    InitState = '[COMPO STATE] Initialize Components State',
 
-    OpenSigninComponent = '[COMPO STATE] OPEN SIGNIN COMPONENT',
-    CloseSigninComponent = '[COMPO STATE] CLOSE SIGNIN COMPONENT',
+    OpenSigninComponent = '[COMPO STATE] Open signin component',
+    CloseSigninComponent = '[COMPO STATE] Close signin component',
     
-    OpenSignupComponent = '[COMPO STATE] OPEN SIGNUP COMPONENT',
-    CloseSignupComponent = '[COMPO STATE] CLOSE SIGNUP COMPONENT'    
+    OpenSignupComponent = '[COMPO STATE] Open signup component',
+    CloseSignupComponent = '[COMPO STATE] Close signup component'    
 }
 
 export interface IComponentStateStore {

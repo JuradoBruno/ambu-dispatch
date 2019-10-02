@@ -61,6 +61,19 @@
             }
         }
     }
+
+    .bottom-right-buttons-container {
+        position: absolute;
+        z-index: 1;
+        bottom: 15px;
+        right: 15px;
+        display: flex;
+        align-items: center;
+        img {
+            width: 55px;
+        }
+    }
+
 }
 
 .leaflet-control-minimap {

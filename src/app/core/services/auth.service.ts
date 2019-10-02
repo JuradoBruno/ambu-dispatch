@@ -19,13 +19,18 @@ export class AuthService extends ObservableStore<IStoreState>{
   isAuthenticated = false;
   @Output() authChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
+  initialState: IAuthStore = {
+    user: null
+  }
+
   constructor(
     private http: HttpClient,
     private baseHttpService: BaseHttpService
   ) {
     super({
-      trackStateHistory: false
+      trackStateHistory: true
     })
+    this.setState(this.initialState, AuthActions.InitState)
   }
 
   getUsername() {
@@ -43,9 +48,9 @@ export class AuthService extends ObservableStore<IStoreState>{
     return this.http.post<any>(this.authUrl + '/signin', userData).toPromise().then((response: ISigninDto) => {
       if (!response.accessToken) return false // Wrong data incoming
       this.baseHttpService.saveToken(response.accessToken)
-      // store user in the store's State:
       let user = new User(response.user)
-      
+      this.setState({ user }, AuthActions.StoreCurrentUser)      
+      console.log("TCL: AuthService -> this.stateHistory", this.stateHistory)
       return true
     }).catch(error => {
       
@@ -90,4 +95,14 @@ export class AuthService extends ObservableStore<IStoreState>{
     
     return token? true : false
   }
+}
+
+export enum AuthActions {
+  InitState = '[AUTH] Initialize Auth state',
+    
+  StoreCurrentUser = '[AUTH] Store current USER'    
+}
+
+export interface IAuthStore {
+  user: User,
 }

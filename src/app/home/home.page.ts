@@ -9,6 +9,8 @@ import route01 from "../services/route01.json"
 import route01Duration from "../services/route01-duration.json"
 import { Router } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
+import { SubSink } from 'subsink';
+import { IStoreState } from '../shared/interfaces/store-state.interface';
 
 @Component({
   selector: 'app-home',
@@ -16,6 +18,8 @@ import { AuthService } from '../core/services/auth.service';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
+  subs = new SubSink()
+
   map
   miniMap
   osmStreetMap = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
@@ -77,12 +81,28 @@ export class HomePage {
     center: L.latLng([43.609598, 1.401405])
   };
   layersControlOptions: L.ControlOptions = { position: 'bottomright' };
+  
+  coinMoney: any;
+  cashMoney: any;
 
   constructor( 
     private router: Router,
     private authService: AuthService) {}
 
   ngOnInit() {
+    console.log("TCL: HomePage -> ngOnInit -> ngOnInit")
+    this.listenToOrientationChange()
+    this.listenToMoneyAmounts()    
+  }
+
+  listenToMoneyAmounts() {
+    this.subs.sink = this.authService.stateChanged.subscribe((state: IStoreState) => {
+      this.coinMoney = state.user.coin_money 
+      this.cashMoney = state.user.cash_money
+    })
+  }
+  
+  listenToOrientationChange() {
     window.addEventListener("orientationchange", () => {    
       this.updateMarginBottomMinimap()
     }, true);
@@ -128,7 +148,8 @@ export class HomePage {
       shadowRectOptions: rect2,
       height: 120,
       width: 120
-    }).addTo(this.map)
+    })
+    // .addTo(this.map)
     this.setMinimapStyles(this.miniMap._container.style)
     this.updateMarginBottomMinimap()
   }
