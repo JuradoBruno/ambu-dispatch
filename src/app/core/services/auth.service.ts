@@ -1,11 +1,12 @@
 import { Injectable, Output, EventEmitter } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { map, take, catchError } from 'rxjs/operators';
-import { IUserSigninData, IAuthToken, IUserSignupData } from 'src/app/shared/interfaces';
+import { IUserSigninData, ISigninDto, IUserSignupData } from 'src/app/shared/interfaces';
 import { Observable } from 'rxjs';
 import { ObservableStore } from '@codewithdan/observable-store';
 import { IStoreState } from 'src/app/shared/interfaces/store-state.interface';
 import { BaseHttpService } from './base-http.service';
+import { User } from 'src/app/models/User.model';
 
 @Injectable({
   providedIn: 'root'
@@ -39,11 +40,15 @@ export class AuthService extends ObservableStore<IStoreState>{
   }
 
   signin(userData: IUserSigninData): Promise<boolean> {
-    return this.http.post<any>(this.authUrl + '/signin', userData).toPromise().then((response: IAuthToken) => {
+    return this.http.post<any>(this.authUrl + '/signin', userData).toPromise().then((response: ISigninDto) => {
       if (!response.accessToken) return false // Wrong data incoming
       this.baseHttpService.saveToken(response.accessToken)
+      // store user in the store's State:
+      let user = new User(response.user)
+      
       return true
     }).catch(error => {
+      
       if (error.status == 401) return false
       console.error(error)
     })

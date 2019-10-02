@@ -72,9 +72,9 @@ export enum ComponentStateActions {
     CloseSigninComponent = '[COMPO STATE] CLOSE SIGNIN COMPONENT',
     
     OpenSignupComponent = '[COMPO STATE] OPEN SIGNUP COMPONENT',
-    CloseSignupComponent = '[COMPO STATE] CLOSE SIGNUP COMPONENT'
-    
+    CloseSignupComponent = '[COMPO STATE] CLOSE SIGNUP COMPONENT'    
 }
+
 export interface IComponentStateStore {
     showSigninComponent: boolean,
     showSignupComponent: boolean

@@ -61,7 +61,7 @@ export class SigninComponent implements OnInit, OnDestroy {
   buildSigninForm() {
     this.signinForm = this.formBuilder.group({
       username: [this.savedUsername, [Validators.required, Validators.minLength(3)]],
-      password: ['', [Validators.required, ValidationService.passwordValidator]]
+      password: ['Syncmaster2605!', [Validators.required, ValidationService.passwordValidator]]
     })
   }
 

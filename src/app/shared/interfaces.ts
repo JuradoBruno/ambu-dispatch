@@ -1,3 +1,5 @@
+import { User } from '../models/User.model';
+
 export interface IUserSignupData {
     username: string;
     password: string;
@@ -9,6 +11,7 @@ export interface IUserSigninData {
     password: string;
 }
 
-export interface IAuthToken {
+export interface ISigninDto {
     accessToken: string;
+    user: User;
 }
