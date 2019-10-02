@@ -15,6 +15,23 @@
       
       <ion-button class="leave-button" color="danger" (click)="signout()">X</ion-button>
 
+      <div class="moneys-container">
+        <div class="game-coins-container">
+          <img src="assets/icon/coin.png" alt="The image representing the ingame earned money" class="coin-image">
+          <div class="game-coins-ruban">
+              <span class="money-amount-span">115000</span>
+          </div>
+        </div>
+  
+        <div class="game-coins-container">
+          <img src="assets/icon/cash.png" alt="The image representing the ingame earned money" class="coin-image">
+          <div class="game-coins-ruban cash">
+              <span class="money-amount-span">142</span>
+          </div>
+        </div>
+      </div>
+
+
       <div class="buttons-container">
         <div class="control-buttons-container" *ngIf="firstMissionstarted">   
           <ion-button *ngIf="!missionIsRunning" color="danger" class="control-button" (click)="continueMission()">
@@ -29,8 +46,6 @@
         <ion-button color="danger" class="mission-button mission" (click)="getTheTruckMoving({})" [disabled]="disableMissionButton">Transférer un patient</ion-button>
         <!-- <ion-button color="secondary" class="mission-button routing" (click)="addRouting()">Start routing</ion-button> -->
       </div>
-       
-       
   
     </div>
   </div>

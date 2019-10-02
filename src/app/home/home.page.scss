@@ -16,6 +16,51 @@
 }
 
 .interface-container {
+    .moneys-container {
+        
+        position: absolute;
+        z-index: 1;
+        top: 15px;
+        right: 15px;
+        display: flex;
+        align-items: center;
+
+        .game-coins-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding-left: 15px;
+
+            .coin-image {
+                height: 40px;
+                z-index: 2;
+                right: 0px;
+                position: absolute;
+            }
+    
+            .game-coins-ruban {
+                background-color: rgba(0, 0, 0, 0.3);
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                margin-right: 15px;
+                padding-right: 30px;
+                padding-left: 10px;
+                border-radius: 10px;
+                min-width: 100px;
+                height: 25px;
+
+                &.cash {
+                    margin-right: 28px;
+                }
+            }
+    
+            .money-amount-span {
+                color: white;
+                font-weight: bold;
+            }
+        }
+    }
 }
 
 .leaflet-control-minimap {
