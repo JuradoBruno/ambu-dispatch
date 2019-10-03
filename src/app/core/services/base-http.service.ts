@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ObservableStore } from '@codewithdan/observable-store';
-import { IStoreState } from 'src/app/shared/interfaces/store-state.interface';
+import { IStoreState } from 'src/app/core/stores/store-state.interface';
 import { HttpHeaders } from '@angular/common/http';
 
 @Injectable()

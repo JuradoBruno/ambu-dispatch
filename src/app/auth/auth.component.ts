@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ComponentsStateService, ComponentStateActions } from '../core/services/components-state.service';
+import { ComponentsStateStore, ComponentStateActions } from '../core/stores/components-state.store';
 import { Observable } from 'rxjs';
 import { SubSink } from 'subsink';
 import { map } from 'rxjs/operators';
-import { IStoreState } from '../shared/interfaces/store-state.interface';
+import { IStoreState } from '../core/stores/store-state.interface';
 import { AuthService } from '../core/services/auth.service';
 import { Router } from '@angular/router';
 
@@ -22,7 +22,7 @@ export class AuthComponent implements OnInit, OnDestroy {
   showSignin$: Observable<boolean>
 
   constructor(
-    private componentsStateService: ComponentsStateService,
+    private ComponentsStateStore: ComponentsStateStore,
     private authService: AuthService,
     private router: Router
     ) { }
@@ -37,7 +37,7 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   observeSigninAndSignupState() {    
-    this.subs.sink = this.componentsStateService.stateChanged.subscribe((state: IStoreState) => {
+    this.subs.sink = this.ComponentsStateStore.stateChanged.subscribe((state: IStoreState) => {
       this.showSignin = state.showSigninComponent
       this.showSignup = state.showSignupComponent
     })
@@ -52,7 +52,7 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   openSignin() {
-    this.componentsStateService.changeComponentState(ComponentStateActions.OpenSigninComponent)
+    this.ComponentsStateStore.changeComponentState(ComponentStateActions.OpenSigninComponent)
   }
 
   ngOnDestroy(): void {

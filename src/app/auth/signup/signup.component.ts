@@ -5,10 +5,10 @@ import { IUserSigninData } from 'src/app/shared/interfaces';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ModalService } from 'src/app/core/modal/modal.service';
-import { ComponentsStateService, ComponentStateActions } from 'src/app/core/services/components-state.service';
+import { ComponentsStateStore, ComponentStateActions } from 'src/app/core/stores/components-state.store';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { SubSink } from 'subsink';
-import { IStoreState } from 'src/app/shared/interfaces/store-state.interface';
+import { IStoreState } from 'src/app/core/stores/store-state.interface';
 
 @Component({
   selector: 'bj-signup',
@@ -43,9 +43,9 @@ export class SignupComponent implements OnInit {
   constructor(private authService: AuthService,
     private formBuilder: FormBuilder,
     private modal: ModalService,
-    private componentStateService: ComponentsStateService,
+    private componentStateService: ComponentsStateStore,
     private router: Router,
-    private componentsStateService: ComponentsStateService
+    private ComponentsStateStore: ComponentsStateStore
   ) {
   }
 
@@ -55,7 +55,7 @@ export class SignupComponent implements OnInit {
   }
 
   observeSelf() {
-    this.subs.sink = this.componentsStateService.globalStateChanged.subscribe((state: IStoreState) => {
+    this.subs.sink = this.ComponentsStateStore.globalStateChanged.subscribe((state: IStoreState) => {
       this.show = state.showSignupComponent
       this.showDimmedBackground = !state.showSigninComponent // Signin already has one
     })

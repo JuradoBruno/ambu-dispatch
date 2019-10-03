@@ -10,7 +10,10 @@ import route01Duration from "../services/route01-duration.json"
 import { Router } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 import { SubSink } from 'subsink';
-import { IStoreState } from '../shared/interfaces/store-state.interface';
+import { IStoreState } from '../core/stores/store-state.interface';
+import { ComponentsStateStore, ComponentStateActions } from '../core/stores/components-state.store';
+import { Observable } from 'rxjs';
+import { UserStore } from '../core/stores/user.store';
 
 @Component({
   selector: 'app-home',
@@ -84,20 +87,24 @@ export class HomePage {
   
   coinMoney: any;
   cashMoney: any;
+  showConstructionTab: boolean;
 
   constructor( 
     private router: Router,
-    private authService: AuthService) {}
+    private authService: AuthService,
+    private userStore: UserStore,
+    private componentStateStore: ComponentsStateStore) {}
 
   ngOnInit() {
-    console.log("TCL: HomePage -> ngOnInit -> ngOnInit")
     this.listenToOrientationChange()
     this.listenToMoneyAmounts()    
+    // showConstructionTab = this.auth
   }
 
   listenToMoneyAmounts() {
-    this.subs.sink = this.authService.stateChanged.subscribe((state: IStoreState) => {
-      this.coinMoney = state.user.coin_money 
+    this.subs.sink = this.userStore.stateChanged.subscribe((state: IStoreState) => {
+      console.log("TCL: HomePage -> listenToMoneyAmounts -> state", state)
+      this.coinMoney = state.user.coin_money
       this.cashMoney = state.user.cash_money
     })
   }
@@ -106,6 +113,10 @@ export class HomePage {
     window.addEventListener("orientationchange", () => {    
       this.updateMarginBottomMinimap()
     }, true);
+  }
+
+  openConstructionTab() {
+    this.componentStateStore.changeComponentState(ComponentStateActions.OpenConstructionTab)
   }
 
   onMapAlmostReady(map: L.Map) {
@@ -150,8 +161,8 @@ export class HomePage {
       width: 120
     })
     // .addTo(this.map)
-    this.setMinimapStyles(this.miniMap._container.style)
-    this.updateMarginBottomMinimap()
+    // this.setMinimapStyles(this.miniMap._container.style)
+    // this.updateMarginBottomMinimap()
   }
 
   setMinimapStyles (styles) {

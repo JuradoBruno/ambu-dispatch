@@ -5,9 +5,10 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { GrowlerModule } from './growler/growler.module';
 import { EnsureModuleLoadedOnceGuard } from './ensure-module-loaded-once.guard';
 import { ModalModule } from './modal/modal.module';
-import { ComponentsStateService } from './services/components-state.service';
+import { ComponentsStateStore } from './stores/components-state.store';
 import { StateService } from './services/state.service';
 import { BaseHttpService } from './services/base-http.service';
+import { UserStore } from './stores/user.store';
 
 @NgModule({
   declarations: [],
@@ -25,7 +26,8 @@ import { BaseHttpService } from './services/base-http.service';
   providers: [
     AuthService,
     HttpClient,
-    ComponentsStateService,
+    ComponentsStateStore,
+    UserStore,
     StateService,
     BaseHttpService
   ],

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { IStoreState } from 'src/app/shared/interfaces/store-state.interface';
+import { IStoreState } from 'src/app/core/stores/store-state.interface';
 import { ObservableStore } from '@codewithdan/observable-store';
 
 @Injectable()

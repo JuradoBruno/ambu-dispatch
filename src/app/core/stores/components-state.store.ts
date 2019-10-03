@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { ObservableStore } from '@codewithdan/observable-store';
-import { IStoreState } from 'src/app/shared/interfaces/store-state.interface';
+import { IStoreState } from 'src/app/core/stores/store-state.interface';
 import { of, Observable } from 'rxjs';
 
 @Injectable()
-export class ComponentsStateService extends ObservableStore<IStoreState> {
+export class ComponentsStateStore extends ObservableStore<IStoreState> {
 
     initialState: IComponentStateStore = {
         showSigninComponent: false,
@@ -66,13 +66,16 @@ export class ComponentsStateService extends ObservableStore<IStoreState> {
 
 
 export enum ComponentStateActions {
-    InitState = '[COMPO STATE] Initialize Components State',
+  InitState = '[COMPO STATE] Initialize Components State',
 
-    OpenSigninComponent = '[COMPO STATE] Open signin component',
-    CloseSigninComponent = '[COMPO STATE] Close signin component',
-    
-    OpenSignupComponent = '[COMPO STATE] Open signup component',
-    CloseSignupComponent = '[COMPO STATE] Close signup component'    
+  OpenSigninComponent = '[COMPO STATE] Open signin component',
+  CloseSigninComponent = '[COMPO STATE] Close signin component',
+
+  OpenSignupComponent = '[COMPO STATE] Open signup component',
+  CloseSignupComponent = '[COMPO STATE] Close signup component',
+
+  OpenConstructionTab = "[COMPO STATE] Open Construction Tab",
+  CloseConstructionTab = "[COMPO STATE] Close Construction Tab",
 }
 
 export interface IComponentStateStore {

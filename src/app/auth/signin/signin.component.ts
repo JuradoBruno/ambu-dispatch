@@ -6,9 +6,9 @@ import { ValidationService } from 'src/app/core/services/validation.service';
 import { Router } from '@angular/router';
 import { IUserSigninData } from 'src/app/shared/interfaces';
 import { take } from 'rxjs/operators';
-import { ComponentsStateService, ComponentStateActions } from 'src/app/core/services/components-state.service';
+import { ComponentsStateStore, ComponentStateActions } from 'src/app/core/stores/components-state.store';
 import { SubSink } from 'subsink';
-import { IStoreState } from 'src/app/shared/interfaces/store-state.interface';
+import { IStoreState } from 'src/app/core/stores/store-state.interface';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 
 @Component({
@@ -43,7 +43,7 @@ export class SigninComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private modal: ModalService,
     private router: Router,
-    private componentsStateService: ComponentsStateService
+    private ComponentsStateStore: ComponentsStateStore
   ) { }
 
   ngOnInit() {
@@ -53,7 +53,7 @@ export class SigninComponent implements OnInit, OnDestroy {
   }
 
   observeSelf() {
-    this.subs.sink = this.componentsStateService.globalStateChanged.subscribe((state: IStoreState) => {
+    this.subs.sink = this.ComponentsStateStore.globalStateChanged.subscribe((state: IStoreState) => {
       this.show = state.showSigninComponent
     })
   }
@@ -66,7 +66,7 @@ export class SigninComponent implements OnInit, OnDestroy {
   }
 
   openSignupForm() {
-    this.componentsStateService.changeComponentState(ComponentStateActions.OpenSignupComponent)
+    this.ComponentsStateStore.changeComponentState(ComponentStateActions.OpenSignupComponent)
   }
 
   signin() {
@@ -87,7 +87,7 @@ export class SigninComponent implements OnInit, OnDestroy {
       }
       // We are signed In
       this.authService.saveUsername(userData.username)
-      this.componentsStateService.changeComponentState(ComponentStateActions.CloseSigninComponent)
+      this.ComponentsStateStore.changeComponentState(ComponentStateActions.CloseSigninComponent)
       this.router.navigate(['/home'])
     })
   }
@@ -101,7 +101,7 @@ export class SigninComponent implements OnInit, OnDestroy {
   }
 
   closeSelf() {
-    this.componentsStateService.changeComponentState(ComponentStateActions.CloseSigninComponent)
+    this.ComponentsStateStore.changeComponentState(ComponentStateActions.CloseSigninComponent)
   }
 
   ngOnDestroy(): void {

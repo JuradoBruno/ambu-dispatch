@@ -4,14 +4,15 @@ import { map, take, catchError } from 'rxjs/operators';
 import { IUserSigninData, ISigninDto, IUserSignupData } from 'src/app/shared/interfaces';
 import { Observable } from 'rxjs';
 import { ObservableStore } from '@codewithdan/observable-store';
-import { IStoreState } from 'src/app/shared/interfaces/store-state.interface';
+import { IStoreState } from 'src/app/core/stores/store-state.interface';
 import { BaseHttpService } from './base-http.service';
 import { User } from 'src/app/models/User.model';
+import { UserStore } from '../stores/user.store';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService extends ObservableStore<IStoreState>{
+export class AuthService{
   
   // baseUrl = 'https://ambu-dispatch-recette.eu-west-1.elasticbeanstalk.com' // Get that from .env
   baseUrl = 'http://localhost:3000' // Get that from .env
@@ -19,19 +20,11 @@ export class AuthService extends ObservableStore<IStoreState>{
   isAuthenticated = false;
   @Output() authChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-  initialState: IAuthStore = {
-    user: null
-  }
-
   constructor(
     private http: HttpClient,
-    private baseHttpService: BaseHttpService
-  ) {
-    super({
-      trackStateHistory: true
-    })
-    this.setState(this.initialState, AuthActions.InitState)
-  }
+    private baseHttpService: BaseHttpService,
+    private userStore: UserStore
+  ) {}
 
   getUsername() {
     let username = localStorage.getItem('username')
@@ -49,8 +42,7 @@ export class AuthService extends ObservableStore<IStoreState>{
       if (!response.accessToken) return false // Wrong data incoming
       this.baseHttpService.saveToken(response.accessToken)
       let user = new User(response.user)
-      this.setState({ user }, AuthActions.StoreCurrentUser)      
-      console.log("TCL: AuthService -> this.stateHistory", this.stateHistory)
+      this.userStore.storeCurrentUser(user)
       return true
     }).catch(error => {
       
@@ -97,9 +89,9 @@ export class AuthService extends ObservableStore<IStoreState>{
   }
 }
 
-export enum AuthActions {
+export enum UserActions {
   InitState = '[AUTH] Initialize Auth state',
-    
+
   StoreCurrentUser = '[AUTH] Store current USER'    
 }
 
