@@ -15,7 +15,9 @@
       
       <ion-button class="leave-button" color="danger" (click)="signout()">X</ion-button>
 
+      <!-- Top Right Money -->
       <div class="moneys-container">
+        <!-- Coin Money -->
         <div class="game-coins-container">
           <img src="assets/icon/coin.png" alt="The image representing the ingame earned money" class="coin-image">
           <div class="game-coins-ruban">
@@ -23,6 +25,7 @@
           </div>
         </div>
   
+        <!-- Cash Money -->
         <div class="game-coins-container">
           <img src="assets/icon/cash.png" alt="The image representing the ingame earned money" class="coin-image">
           <div class="game-coins-ruban cash">
@@ -31,14 +34,59 @@
         </div>
       </div>
 
+      <!-- Right Bottom Buttons -->
       <div class="bottom-right-buttons-container">
         <img src="assets/icon/buildings.png" alt="Acheter un batiment" (click)="openConstructionTab()" class="buildings-image">
       </div>
 
+      <!-- Right Half Screen Panels -->
+      <div class="right-panels-container" *ngIf="showConstructionTab">
+        <!-- Left Column (icon switches) -->
+        <div class="left-column">
+          <!-- <div class="icon-container">
+            <img src="assets/icon/buildings.png" alt="Acheter un batiment" (click)="openConstructionTab()" class="buildings-image">
+          </div> -->
+        </div>
+        <div class="right-column">
+          <div class="padded-container">
+            <!-- Buildings Section -->
+            <div class="section-header"> 
+              <span class="section-name">Construction</span>
+              <img src="assets/icon/close-white.png" alt="Close the window" class="close-right-tab-image" (click)="closeConstructionBuildingsTab()">
+            </div>
+            <div class="building-type-container">
+              
+              <div class="type-name">Hôpitaux</div>              
+              <div class="buildings-container">
+                <div class="building-container">
+                  <!-- Icon & Name -->
+                  <div class="left-part">
+                    <img src="assets/icon/hopital-rond-strong.png" alt="" class="building-icon">
+                    <span class="building-name">Hôpital</span>
+                  </div>
+                  
+                  <!-- Construction Time & Prices -->
+                  <div class="right-part">
+                    <span class="construction-time">8h</span>
+                    <div class="building-price-container orange">
+                      <span class="price">100 000</span>
+                      <img src="assets/icon/coin.png" alt="The image representing the ingame earned money" class="building-price-image">
+                    </div>
+                    <div class="building-price-container green">
+                      <span class="price">100</span>
+                      <img src="assets/icon/cash.png" alt="The image representing the ingame earned money" class="building-price-image">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            
+            </div>
+          </div>
+        </div>
+      </div>
 
 
-
-      <div class="buttons-container">
+      <!-- <div class="buttons-container">
         <div class="control-buttons-container" *ngIf="firstMissionstarted">   
           <ion-button *ngIf="!missionIsRunning" color="danger" class="control-button" (click)="continueMission()">
             <ion-icon name="play"></ion-icon>
@@ -49,9 +97,9 @@
           </ion-button>
         </div>
  
-        <!-- <ion-button color="danger" class="mission-button mission" (click)="getTheTruckMoving({})" [disabled]="disableMissionButton">Transférer un patient</ion-button> -->
-        <!-- <ion-button color="secondary" class="mission-button routing" (click)="addRouting()">Start routing</ion-button> -->
-      </div>
+        <ion-button color="danger" class="mission-button mission" (click)="getTheTruckMoving({})" [disabled]="disableMissionButton">Transférer un patient</ion-button>
+        <ion-button color="secondary" class="mission-button routing" (click)="addRouting()">Start routing</ion-button>
+      </div> -->
   
     </div>
   </div>

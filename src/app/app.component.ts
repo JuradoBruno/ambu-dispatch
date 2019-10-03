@@ -22,10 +22,11 @@ export class AppComponent {
   }
 
   initializeApp() {
+    console.log("TCL: AppComponent -> initializeApp -> this.platform", this.platform)
+    this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.LANDSCAPE).catch(err => {
+      console.error(err)
+    })
     this.platform.ready().then(() => {
-      this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.LANDSCAPE).catch(err => {
-        console.error(err)
-      })
       this.statusBar.hide();
       this.splashScreen.hide();
 

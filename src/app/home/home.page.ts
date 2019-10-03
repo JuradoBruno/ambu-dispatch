@@ -97,15 +97,21 @@ export class HomePage {
 
   ngOnInit() {
     this.listenToOrientationChange()
-    this.listenToMoneyAmounts()    
-    // showConstructionTab = this.auth
+    this.listenToMoneyAmounts()
+    this.listenToComponentsState()
+    // Listen to Construction tab state
   }
-
+  
   listenToMoneyAmounts() {
     this.subs.sink = this.userStore.stateChanged.subscribe((state: IStoreState) => {
-      console.log("TCL: HomePage -> listenToMoneyAmounts -> state", state)
       this.coinMoney = state.user.coin_money
       this.cashMoney = state.user.cash_money
+    })
+  }
+
+  listenToComponentsState() {
+    this.subs.sink = this.componentStateStore.stateChanged.subscribe((state: IStoreState) => {
+      this.showConstructionTab = state.showConstuctionTab
     })
   }
   
@@ -114,9 +120,13 @@ export class HomePage {
       this.updateMarginBottomMinimap()
     }, true);
   }
-
+  
   openConstructionTab() {
     this.componentStateStore.changeComponentState(ComponentStateActions.OpenConstructionTab)
+  }
+
+  closeConstructionBuildingsTab() {
+    this.componentStateStore.changeComponentState(ComponentStateActions.CloseConstructionTab)
   }
 
   onMapAlmostReady(map: L.Map) {

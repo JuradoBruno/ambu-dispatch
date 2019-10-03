@@ -8,7 +8,8 @@ export class ComponentsStateStore extends ObservableStore<IStoreState> {
 
     initialState: IComponentStateStore = {
         showSigninComponent: false,
-        showSignupComponent: false
+        showSignupComponent: false,
+        showConstuctionTab: false
     }
 
     constructor() {
@@ -18,6 +19,7 @@ export class ComponentsStateStore extends ObservableStore<IStoreState> {
                 return {
                     showSigninComponent: state.showSigninComponent,
                     showSignupComponent: state.showSignupComponent,
+                    showConstuctionTab: state.showConstuctionTab,
                 }
             }
         })
@@ -29,17 +31,25 @@ export class ComponentsStateStore extends ObservableStore<IStoreState> {
             case ComponentStateActions.OpenSigninComponent:
                 this.setState({ showSigninComponent: true }, ComponentStateActions.OpenSigninComponent)
                 break;
+                
+            case ComponentStateActions.CloseSigninComponent:
+                this.setState({ showSigninComponent: false }, ComponentStateActions.CloseSigninComponent)
+                break;
 
             case ComponentStateActions.OpenSignupComponent:
                 this.setState({ showSignupComponent: true }, ComponentStateActions.OpenSignupComponent)
                 break;
 
-            case ComponentStateActions.CloseSigninComponent:
-                this.setState({ showSigninComponent: false }, ComponentStateActions.CloseSigninComponent)
-                break;
-
             case ComponentStateActions.CloseSignupComponent:
                 this.setState({ showSignupComponent: false }, ComponentStateActions.CloseSignupComponent)
+                break;
+
+            case ComponentStateActions.OpenConstructionTab:
+                this.setState({ showConstuctionTab: true }, ComponentStateActions.OpenConstructionTab)
+                break;
+
+            case ComponentStateActions.CloseConstructionTab:
+                this.setState({ showConstuctionTab: false }, ComponentStateActions.CloseConstructionTab)
                 break;
 
             default:
@@ -80,5 +90,6 @@ export enum ComponentStateActions {
 
 export interface IComponentStateStore {
     showSigninComponent: boolean,
-    showSignupComponent: boolean
+    showSignupComponent: boolean,
+    showConstuctionTab: boolean
 }
