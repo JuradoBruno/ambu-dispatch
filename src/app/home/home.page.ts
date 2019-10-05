@@ -14,6 +14,8 @@ import { IStoreState } from '../core/stores/store-state.interface';
 import { ComponentsStateStore, ComponentStateActions } from '../core/stores/components-state.store';
 import { Observable } from 'rxjs';
 import { UserStore } from '../core/stores/user.store';
+import { BuildingsStore } from '../core/stores/buildings.store';
+import { Building } from '../models/Buildings.model';
 
 @Component({
   selector: 'app-home',
@@ -88,30 +90,42 @@ export class HomePage {
   coinMoney: any;
   cashMoney: any;
   showConstructionTab: boolean;
+  buildings: Building[]
 
   constructor( 
     private router: Router,
     private authService: AuthService,
     private userStore: UserStore,
+    private buildingStore: BuildingsStore,
     private componentStateStore: ComponentsStateStore) {}
 
   ngOnInit() {
     this.listenToOrientationChange()
     this.listenToMoneyAmounts()
     this.listenToComponentsState()
+    this.listenToBuildingsState()
+
     // Listen to Construction tab state
   }
   
   listenToMoneyAmounts() {
     this.subs.sink = this.userStore.stateChanged.subscribe((state: IStoreState) => {
-      this.coinMoney = state.user.coin_money
-      this.cashMoney = state.user.cash_money
+      this.coinMoney = state.user.coinMoney
+      this.cashMoney = state.user.cashMoney
     })
   }
 
   listenToComponentsState() {
     this.subs.sink = this.componentStateStore.stateChanged.subscribe((state: IStoreState) => {
       this.showConstructionTab = state.showConstuctionTab
+    })
+  }
+  
+  listenToBuildingsState() {
+    this.subs.sink = this.buildingStore.stateChanged.subscribe((state: IStoreState) => {
+      console.log("TCL: HomePage -> listenToBuildingsState -> state", state)
+      this.buildings = state.buildings
+      console.log("TCL: HomePage -> listenToBuildingsState -> this.buildings", this.buildings)
     })
   }
   

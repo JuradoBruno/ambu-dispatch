@@ -13,16 +13,7 @@ export class ComponentsStateStore extends ObservableStore<IStoreState> {
     }
 
     constructor() {
-        super({
-            trackStateHistory: true,
-            stateSliceSelector: state => { // This is the properties that will be used as "state" here.
-                return {
-                    showSigninComponent: state.showSigninComponent,
-                    showSignupComponent: state.showSignupComponent,
-                    showConstuctionTab: state.showConstuctionTab,
-                }
-            }
-        })
+        super({trackStateHistory: true})
         this.setState(this.initialState, ComponentStateActions.InitState) // CRUCIAL to be able to use "stateChanged" instead of "globalStateChanged"
     }
 

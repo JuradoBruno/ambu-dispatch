@@ -8,7 +8,9 @@ export class StateService extends ObservableStore<IStoreState>  {
         accessToken: null,
         showSignupComponent: false,
         showSigninComponent: false,
-        user: {}
+        showConstuctionTab: false,
+        user: {},
+        buildings: []
     }
 
     constructor() {
@@ -16,6 +18,6 @@ export class StateService extends ObservableStore<IStoreState>  {
     }
     
     InitializeState() {
-        this.setState(this.initialState)
+        // this.setState(this.initialState)
     }
 }

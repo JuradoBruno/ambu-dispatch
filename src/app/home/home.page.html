@@ -58,26 +58,29 @@
               
               <div class="type-name">Hôpitaux</div>              
               <div class="buildings-container">
-                <div class="building-container">
+
+
+                <div class="building-container" *ngFor="let building of buildings">
                   <!-- Icon & Name -->
                   <div class="left-part">
                     <img src="assets/icon/hopital-rond-strong.png" alt="" class="building-icon">
-                    <span class="building-name">Hôpital</span>
+                    <span class="building-name">{{building.title}}</span>
                   </div>
                   
                   <!-- Construction Time & Prices -->
                   <div class="right-part">
                     <span class="construction-time">8h</span>
-                    <div class="building-price-container orange">
-                      <span class="price">100 000</span>
+                    <button class="building-price-container orange">
+                      <span class="price">{{building.coinPrice}}</span>
                       <img src="assets/icon/coin.png" alt="The image representing the ingame earned money" class="building-price-image">
-                    </div>
-                    <div class="building-price-container green">
-                      <span class="price">100</span>
+                    </button>
+                    <button class="building-price-container green">
+                      <span class="price">{{building.cashPrice}}</span>
                       <img src="assets/icon/cash.png" alt="The image representing the ingame earned money" class="building-price-image">
-                    </div>
+                    </button>
                   </div>
                 </div>
+
               </div>
             
             </div>

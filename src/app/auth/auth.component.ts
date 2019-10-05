@@ -6,6 +6,7 @@ import { map } from 'rxjs/operators';
 import { IStoreState } from '../core/stores/store-state.interface';
 import { AuthService } from '../core/services/auth.service';
 import { Router } from '@angular/router';
+import { BuildingsService } from '../core/services/buildings.service';
 
 @Component({
   selector: 'app-auth',
@@ -24,12 +25,14 @@ export class AuthComponent implements OnInit, OnDestroy {
   constructor(
     private ComponentsStateStore: ComponentsStateStore,
     private authService: AuthService,
+    private buildingService: BuildingsService,
     private router: Router
     ) { }
 
   ngOnInit() {
     this.observeSigninAndSignupState()
     this.checkIfPlayerIsSignedId()
+    this.fetchImportantData()
   }
 
   checkIfPlayerIsSignedId() {
@@ -41,6 +44,10 @@ export class AuthComponent implements OnInit, OnDestroy {
       this.showSignin = state.showSigninComponent
       this.showSignup = state.showSignupComponent
     })
+  }
+
+  async fetchImportantData() {
+    this.buildingService.getBuildings()
   }
 
   getUserTasks() {

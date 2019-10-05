@@ -9,6 +9,8 @@ import { ComponentsStateStore } from './stores/components-state.store';
 import { StateService } from './services/state.service';
 import { BaseHttpService } from './services/base-http.service';
 import { UserStore } from './stores/user.store';
+import { BuildingsStore } from './stores/buildings.store';
+import { BuildingsService } from './services/buildings.service';
 
 @NgModule({
   declarations: [],
@@ -27,6 +29,8 @@ import { UserStore } from './stores/user.store';
     AuthService,
     HttpClient,
     ComponentsStateStore,
+    BuildingsStore,
+    BuildingsService,
     UserStore,
     StateService,
     BaseHttpService
