@@ -16,8 +16,8 @@ import { BuildingsStore } from '../stores/buildings.store';
 })
 export class AuthService{
   
-  // baseUrl = 'https://ambu-dispatch-recette.eu-west-1.elasticbeanstalk.com' // Get that from .env
-  baseUrl = environment.baseUrl // Get that from .env
+  // baseUrl = environment.baseUrl // Get that from .env
+  baseUrl = 'https://ambu-dispatch-production.eu-west-1.elasticbeanstalk.com/' // Get that from .env
   authUrl = this.baseUrl + 'auth'
   isAuthenticated = false;
   @Output() authChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

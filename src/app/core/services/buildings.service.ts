@@ -11,7 +11,9 @@ import { User } from '../../models/User.model';
   providedIn: 'root'
 })
 export class BuildingsService{
-  baseUrl = environment.baseUrl
+  // baseUrl = environment.baseUrl
+  baseUrl = 'https://ambu-dispatch-production.eu-west-1.elasticbeanstalk.com/' // Get that from .env
+  
   buildingsUrl = this.baseUrl + 'buildings'
 
   constructor( 

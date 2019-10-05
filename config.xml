@@ -20,7 +20,7 @@
     <preference name="SplashShowOnlyFirstTime" value="false" />
     <preference name="SplashScreen" value="screen" />
     <preference name="SplashScreenDelay" value="3000" />
-    <preference name="HideKeyboardFormAccessoryBar" value="true"/>
+    <preference name="HideKeyboardFormAccessoryBar" value="false" />
     <platform name="android">
         <preference name="Orientation" value="landscape" />
         <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application" xmlns:android="http://schemas.android.com/apk/res/android">
