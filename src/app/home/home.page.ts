@@ -112,23 +112,6 @@ export class HomePage {
     this.listenToOrientationChange()
     this.listenToComponentsState()  
   }
-
-  listenToMouseUpAndDown() {
-    this.map.on('mousedown', event => {
-      if (!this.allowBuildingPlacement) return
-      this.isMouseDownToAddBuilding = true
-      this.mouseDownToAddBuildingTimeout = setTimeout(() => {
-        this.buildingsService.addBuilding(event.latlng, this.buildingToCreate)
-      }, 200);
-    })
-
-    this.map.on('mouseup', event => {
-      if (this.isMouseDownToAddBuilding) {
-        clearTimeout(this.mouseDownToAddBuildingTimeout)
-        this.allowBuildingPlacement = false
-      }
-    })
-  }
   
   listenToUserState() {
     this.subs.sink = this.userStore.stateChanged.subscribe((state: IStoreState) => {
@@ -175,7 +158,21 @@ export class HomePage {
   startBuildingPlacement(building) {
     this.componentStateStore.changeComponentState(ComponentStateActions.CloseConstructionTab)
     this.buildingToCreate = building
-    this.allowBuildingPlacement = true    
+
+    this.map.on('mousedown', event => {
+      this.isMouseDownToAddBuilding = true
+      this.mouseDownToAddBuildingTimeout = setTimeout(() => {
+        this.buildingsService.addBuilding(event.latlng, this.buildingToCreate)
+        this.map.off('mousedown')
+        this.map.off('mouseup')
+      }, 200);
+    })
+
+    this.map.on('mouseup', event => {
+      if (this.isMouseDownToAddBuilding) {
+        clearTimeout(this.mouseDownToAddBuildingTimeout)
+      }
+    })
   }
 
   onMapAlmostReady(map: L.Map) {
@@ -190,7 +187,6 @@ export class HomePage {
   onMapReady() {    
     this.addMinimap()
     this.listenToUserState()
-    this.listenToMouseUpAndDown()
     this.listenToBuildingsState()
     // this.addRouting()
   }
