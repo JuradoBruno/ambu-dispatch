@@ -12,11 +12,11 @@ import { AuthService } from '../core/services/auth.service';
 import { SubSink } from 'subsink';
 import { IStoreState } from '../core/stores/store-state.interface';
 import { ComponentsStateStore, ComponentStateActions } from '../core/stores/components-state.store';
-import { Observable } from 'rxjs';
 import { UserStore } from '../core/stores/user.store';
 import { BuildingsStore } from '../core/stores/buildings.store';
 import { Building } from '../models/Buildings.model';
-import { environment } from 'src/environments/environment';
+import { BuildingsService } from '../core/services/buildings.service';
+import { IBuildingToUser } from '../models/User.model';
 
 @Component({
   selector: 'app-home',
@@ -66,8 +66,8 @@ export class HomePage {
 
   // Marker for the parking lot at the base of Mt. Ranier trails
   redAmbu = L.marker([43.609598, 1.401405], this.redAmbuIcon);
-  hopital1 = L.marker([43.609598, 1.401405], this.hopitalIcon);
-  hopital2 = L.marker([43.601380, 1.433971], this.hopitalIcon);
+  // hopital1 = L.marker([43.609598, 1.401405], this.hopitalIcon);
+  // hopital2 = L.marker([43.601380, 1.433971], this.hopitalIcon);
 
   // Layers control object with our two base layers and the three overlay layers
   layersControl = {
@@ -82,7 +82,8 @@ export class HomePage {
 
   ////// MAIN MAP OPTIONS ///////
   mainMapOptions = {
-    layers: [this.streetMaps, this.hopital1, this.hopital2],
+    // layers: [this.streetMaps, this.hopital1, this.hopital2],
+    layers: [this.streetMaps],
     zoom: 16,
     center: L.latLng([43.609598, 1.401405])
   };
@@ -92,26 +93,49 @@ export class HomePage {
   cashMoney: any;
   showConstructionTab: boolean;
   buildings: Building[]
+  buildingsToUser: IBuildingToUser[] = []
+
+  isMouseDownToAddBuilding = false
+  allowBuildingPlacement = false
+  mouseDownToAddBuildingTimeout: any
+  buildingToCreate: Building
 
   constructor( 
     private router: Router,
     private authService: AuthService,
     private userStore: UserStore,
+    private buildingsService: BuildingsService,
     private buildingStore: BuildingsStore,
     private componentStateStore: ComponentsStateStore) {}
 
   ngOnInit() {
     this.listenToOrientationChange()
-    this.listenToMoneyAmounts()
-    this.listenToComponentsState()
-    this.listenToBuildingsState()
-    // Listen to Construction tab state
+    this.listenToComponentsState()  
+  }
+
+  listenToMouseUpAndDown() {
+    this.map.on('mousedown', event => {
+      if (!this.allowBuildingPlacement) return
+      this.isMouseDownToAddBuilding = true
+      this.mouseDownToAddBuildingTimeout = setTimeout(() => {
+        this.buildingsService.addBuilding(event.latlng, this.buildingToCreate)
+      }, 200);
+    })
+
+    this.map.on('mouseup', event => {
+      if (this.isMouseDownToAddBuilding) {
+        clearTimeout(this.mouseDownToAddBuildingTimeout)
+        this.allowBuildingPlacement = false
+      }
+    })
   }
   
-  listenToMoneyAmounts() {
+  listenToUserState() {
     this.subs.sink = this.userStore.stateChanged.subscribe((state: IStoreState) => {
       this.coinMoney = state.user.coinMoney
       this.cashMoney = state.user.cashMoney
+      if (this.buildingsToUser.length < state.user.buildingsToUser.length) this.populateBuildingsMarker(state.user.buildingsToUser)
+      this.buildingsToUser = state.user.buildingsToUser
     })
   }
 
@@ -125,6 +149,13 @@ export class HomePage {
     this.subs.sink = this.buildingStore.stateChanged.subscribe((state: IStoreState) => {
       this.buildings = state.buildings
     })
+  }
+  
+  populateBuildingsMarker (buildings) {
+    for (const building of buildings) {
+      let newBuilding = L.marker([building.coordinates.x, building.coordinates.y], this.hopitalIcon)
+      newBuilding.addTo(this.map)
+    }
   }
   
   listenToOrientationChange() {
@@ -141,11 +172,10 @@ export class HomePage {
     this.componentStateStore.changeComponentState(ComponentStateActions.CloseConstructionTab)
   }
 
-  allowBuildingPlacement() {
+  startBuildingPlacement(building) {
     this.componentStateStore.changeComponentState(ComponentStateActions.CloseConstructionTab)
-    this.map.on('click', event => {
-      console.log("TCL: HomePage -> allowBuildingPlacement -> event", event)      
-    })
+    this.buildingToCreate = building
+    this.allowBuildingPlacement = true    
   }
 
   onMapAlmostReady(map: L.Map) {
@@ -157,8 +187,11 @@ export class HomePage {
     map.removeControl(map.zoomControl)
   }
 
-  onMapReady() {
+  onMapReady() {    
     this.addMinimap()
+    this.listenToUserState()
+    this.listenToMouseUpAndDown()
+    this.listenToBuildingsState()
     // this.addRouting()
   }
 

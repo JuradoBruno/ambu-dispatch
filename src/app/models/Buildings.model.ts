@@ -1,7 +1,10 @@
 export class Building{
-    id: number
-    title: string
-    description: string
+    buildingCore: {
+        title: string,
+        description: string
+    }
+    id: number    
+    specificDescription: string
     level: number
     coinPrice: number
     cashPrice: number
@@ -14,3 +17,4 @@ export class Building{
         Object.assign(this, building)
     }
 }
+

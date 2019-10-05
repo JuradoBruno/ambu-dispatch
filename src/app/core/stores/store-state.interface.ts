@@ -1,4 +1,5 @@
-import { Building } from 'src/app/models/Buildings.model';
+import { Building } from '../../models/Buildings.model';
+import { IBuildingToUser } from '../../models/User.model';
 
 export interface IStoreState {
     accessToken: string
@@ -6,5 +7,6 @@ export interface IStoreState {
     showSigninComponent: boolean
     showConstuctionTab: boolean
     user: any
+    buildingsToUser: IBuildingToUser[];
     buildings: Building[]
 }

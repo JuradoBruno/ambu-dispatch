@@ -9,6 +9,7 @@ import { BaseHttpService } from './base-http.service';
 import { User } from 'src/app/models/User.model';
 import { UserStore } from '../stores/user.store';
 import { environment } from 'src/environments/environment';
+import { BuildingsStore } from '../stores/buildings.store';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +25,7 @@ export class AuthService{
   constructor(
     private http: HttpClient,
     private baseHttpService: BaseHttpService,
-    private userStore: UserStore
+    private userStore: UserStore,
   ) {}
 
   getUsername() {

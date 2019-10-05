@@ -12,7 +12,8 @@ export class UserStore extends ObservableStore<IStoreState>{
         email: 'jurado.bruno@gmail.com',
         salt: '$2a$10$7TDmMzY1cxt7en/AZIlNMO',
         coinMoney: 159999,
-        cashMoney: 150
+        cashMoney: 150,
+        buildingsToUser: []
     }
 
     testUser = new User(this.testUserData)

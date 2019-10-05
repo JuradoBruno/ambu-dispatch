@@ -64,13 +64,13 @@
                   <!-- Icon & Name -->
                   <div class="left-part">
                     <img src="assets/icon/hopital-rond-strong.png" alt="" class="building-icon">
-                    <span class="building-name">{{building.title}}</span>
+                    <span class="building-name">{{building.buildingCore.title}}</span>
                   </div>
                   
                   <!-- Construction Time & Prices -->
                   <div class="right-part">
                     <span class="construction-time">8h</span>
-                    <button class="building-price-container orange" (click)="allowBuildingPlacement()">
+                    <button class="building-price-container orange" (click)="startBuildingPlacement(building)">
                       <span class="price">{{building.coinPrice}}</span>
                       <img src="assets/icon/coin.png" alt="The image representing the ingame earned money" class="building-price-image">
                     </button>

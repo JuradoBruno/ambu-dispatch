@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Building } from 'src/app/models/Buildings.model';
-import { ObservableStore } from '@codewithdan/observable-store';
-import { IStoreState } from '../stores/store-state.interface';
 import { BuildingsStore } from '../stores/buildings.store';
 import { environment } from 'src/environments/environment';
+import { BaseHttpService } from './base-http.service';
+import { UserStore } from '../stores/user.store';
+import { User } from '../../models/User.model';
 
 @Injectable({
   providedIn: 'root'
@@ -15,11 +16,20 @@ export class BuildingsService{
 
   constructor( 
     private http: HttpClient,
-    private storeBuildings: BuildingsStore) {}
+    private baseHttpService: BaseHttpService,
+    private storeBuildings: BuildingsStore,
+    private userStore: UserStore) {}
 
   getBuildings() {
     this.http.get<Building[]>(this.buildingsUrl).toPromise().then((buildings: Building[]) => {
       this.storeBuildings.storeBuildings(buildings)
+    })
+  }
+
+  addBuilding(latlng, building) {
+    let headers = this.baseHttpService.returnHeaders()
+    return this.http.post(this.buildingsUrl + '/by-coordinates', {latlng, building}, {headers}).toPromise().then((user: User) => {
+      this.userStore.storeCurrentUser(user)
     })
   }
 }
