@@ -4,13 +4,14 @@ import { Building } from 'src/app/models/Buildings.model';
 import { ObservableStore } from '@codewithdan/observable-store';
 import { IStoreState } from '../stores/store-state.interface';
 import { BuildingsStore } from '../stores/buildings.store';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BuildingsService{
-  baseUrl = 'http://localhost:3000'
-  buildingsUrl = this.baseUrl + '/buildings'
+  baseUrl = environment.baseUrl
+  buildingsUrl = this.baseUrl + 'buildings'
 
   constructor( 
     private http: HttpClient,

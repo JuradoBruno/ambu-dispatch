@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   // baseUrl: 'ambu-dispatch-recette.eu-west-1.elasticbeanstalk.com',
-  baseUrl: 'ambu-dispatch-recette.eu-west-1.elasticbeanstalk.com',
+  baseUrl: 'http://localhost:3000/',
   hmr: false
 };
 

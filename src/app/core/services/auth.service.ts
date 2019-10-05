@@ -8,6 +8,7 @@ import { IStoreState } from 'src/app/core/stores/store-state.interface';
 import { BaseHttpService } from './base-http.service';
 import { User } from 'src/app/models/User.model';
 import { UserStore } from '../stores/user.store';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +16,8 @@ import { UserStore } from '../stores/user.store';
 export class AuthService{
   
   // baseUrl = 'https://ambu-dispatch-recette.eu-west-1.elasticbeanstalk.com' // Get that from .env
-  baseUrl = 'http://localhost:3000' // Get that from .env
-  authUrl = this.baseUrl + '/auth'
+  baseUrl = environment.baseUrl // Get that from .env
+  authUrl = this.baseUrl + 'auth'
   isAuthenticated = false;
   @Output() authChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 

@@ -16,6 +16,7 @@ import { Observable } from 'rxjs';
 import { UserStore } from '../core/stores/user.store';
 import { BuildingsStore } from '../core/stores/buildings.store';
 import { Building } from '../models/Buildings.model';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -104,7 +105,6 @@ export class HomePage {
     this.listenToMoneyAmounts()
     this.listenToComponentsState()
     this.listenToBuildingsState()
-
     // Listen to Construction tab state
   }
   
@@ -123,9 +123,7 @@ export class HomePage {
   
   listenToBuildingsState() {
     this.subs.sink = this.buildingStore.stateChanged.subscribe((state: IStoreState) => {
-      console.log("TCL: HomePage -> listenToBuildingsState -> state", state)
       this.buildings = state.buildings
-      console.log("TCL: HomePage -> listenToBuildingsState -> this.buildings", this.buildings)
     })
   }
   
