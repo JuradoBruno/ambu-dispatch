@@ -6,7 +6,6 @@ import { GrowlerModule } from './growler/growler.module';
 import { EnsureModuleLoadedOnceGuard } from './ensure-module-loaded-once.guard';
 import { ModalModule } from './modal/modal.module';
 import { ComponentsStateStore } from './stores/components-state.store';
-import { StateService } from './services/state.service';
 import { BaseHttpService } from './services/base-http.service';
 import { UserStore } from './stores/user.store';
 import { BuildingsStore } from './stores/buildings.store';
@@ -32,7 +31,6 @@ import { BuildingsService } from './services/buildings.service';
     BuildingsStore,
     BuildingsService,
     UserStore,
-    StateService,
     BaseHttpService
   ],
 })

@@ -3,7 +3,6 @@ import { Platform } from '@ionic/angular';
 import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
-import { StateService } from './core/services/state.service';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +15,6 @@ export class AppComponent {
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
     private screenOrientation: ScreenOrientation,
-    private stateService: StateService
   ) {
     this.initializeApp();
   }
@@ -35,6 +33,5 @@ export class AppComponent {
       //   console.error(err)
       // })
     });
-    this.stateService.InitializeState(); // Can be removed?
   }
 }
