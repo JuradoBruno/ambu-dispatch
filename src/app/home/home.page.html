@@ -70,7 +70,7 @@
                   <!-- Construction Time & Prices -->
                   <div class="right-part">
                     <span class="construction-time">8h</span>
-                    <button class="building-price-container orange">
+                    <button class="building-price-container orange" (click)="allowBuildingPlacement()">
                       <span class="price">{{building.coinPrice}}</span>
                       <img src="assets/icon/coin.png" alt="The image representing the ingame earned money" class="building-price-image">
                     </button>

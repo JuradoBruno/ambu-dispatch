@@ -6,8 +6,21 @@ import { Building } from 'src/app/models/Buildings.model';
 @Injectable()
 export class BuildingsStore extends ObservableStore<IStoreState>{
 
+    mockBuilding: Building = {
+        cashPrice: 100,
+        coinPrice: 90000,
+        constructionTime: 480,
+        description: "Mets à disposition des équipes de secouriste et des véhicules",
+        employeeCapacity: 4,
+        id: 1,
+        level: 1,
+        patientCapacity: 0,
+        title: "Caserne d'ambulance",
+        vehicleCapacity: 2
+    }
+
     initialState: IBuildingsStore = {
-        buildings: []
+        buildings: [this.mockBuilding]
     }
 
     constructor() {

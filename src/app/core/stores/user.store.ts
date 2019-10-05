@@ -5,14 +5,14 @@ import { User } from 'src/app/models/User.model';
 
 @Injectable()
 export class UserStore extends ObservableStore<IStoreState>{
-    testUserData = {
+    testUserData: User = {
         id: 49,
-        username: 'Almighty',
+        username: 'MockAlmighty',
         password: '$2a$10$7TDmMzY1cxt7en/AZIlNMOiFN.q1S2biP1LjyEZwpU.pBLd5CGHC2',
         email: 'jurado.bruno@gmail.com',
         salt: '$2a$10$7TDmMzY1cxt7en/AZIlNMO',
-        coin_money: 159999,
-        cash_money: 150
+        coinMoney: 159999,
+        cashMoney: 150
     }
 
     testUser = new User(this.testUserData)

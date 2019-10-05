@@ -4,8 +4,8 @@ export class User {
     password: string
     email: string
     salt: string
-    coin_money: string
-    cash_money: string
+    coinMoney: number
+    cashMoney: number
     
     constructor(user?: any) {
         Object.assign(this, user)

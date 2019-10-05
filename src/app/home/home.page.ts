@@ -141,6 +141,13 @@ export class HomePage {
     this.componentStateStore.changeComponentState(ComponentStateActions.CloseConstructionTab)
   }
 
+  allowBuildingPlacement() {
+    this.componentStateStore.changeComponentState(ComponentStateActions.CloseConstructionTab)
+    this.map.on('click', event => {
+      console.log("TCL: HomePage -> allowBuildingPlacement -> event", event)      
+    })
+  }
+
   onMapAlmostReady(map: L.Map) {
     this.map = map
     setTimeout(() => {
