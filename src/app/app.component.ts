@@ -14,24 +14,14 @@ export class AppComponent {
     private platform: Platform,
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
-    private screenOrientation: ScreenOrientation,
   ) {
     this.initializeApp();
   }
 
   initializeApp() {
-    this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.LANDSCAPE).catch(err => {
-      console.error(err)
-    })
     this.platform.ready().then(() => {
       this.statusBar.hide();
       this.splashScreen.hide();
-
-      // this.androidFullScreen.isImmersiveModeSupported().then(() => {
-      //   this.androidFullScreen.immersiveMode()
-      // }).catch(err => {
-      //   console.error(err)
-      // })
     });
   }
 }
