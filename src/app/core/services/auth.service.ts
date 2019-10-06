@@ -49,6 +49,7 @@ export class AuthService{
       this.baseHttpService.saveToken(response.accessToken)
       let user = new User(response.user)
       this.userStore.storeCurrentUser(user)
+      localStorage.setItem('user', JSON.stringify(user)) // TO REMOVE
       return true
     }).catch(error => {
       

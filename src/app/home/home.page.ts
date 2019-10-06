@@ -109,6 +109,8 @@ export class HomePage {
     private componentStateStore: ComponentsStateStore) {}
 
   ngOnInit() {
+    let user = JSON.parse(localStorage.getItem('user')) // TO REMOVE
+    if (user) this.userStore.storeCurrentUser(user) // TO REMOVE
     this.listenToOrientationChange()
     this.listenToComponentsState()  
   }
