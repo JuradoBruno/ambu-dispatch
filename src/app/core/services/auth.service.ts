@@ -16,17 +16,20 @@ import { BuildingsStore } from '../stores/buildings.store';
 })
 export class AuthService{
   
-  // baseUrl = environment.baseUrl // Get that from .env
-  baseUrl = 'https://ambu-dispatch-production.eu-west-1.elasticbeanstalk.com/' // Get that from .env
+  baseUrl = environment.baseUrl // Get that from .env
+  // baseUrl = 'https://ambu-dispatch-production.eu-west-1.elasticbeanstalk.com/' // Get that from .env
   authUrl = this.baseUrl + 'auth'
   isAuthenticated = false;
   @Output() authChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
-
+  
   constructor(
     private http: HttpClient,
     private baseHttpService: BaseHttpService,
     private userStore: UserStore,
-  ) {}
+  ) {
+    console.log("TCL: AuthService -> baseUrl", this.baseUrl)
+
+  }
 
   getUsername() {
     let username = localStorage.getItem('username')
@@ -40,6 +43,7 @@ export class AuthService{
   }
 
   signin(userData: IUserSigninData): Promise<boolean> {
+    console.log("TCL: AuthService -> this.authUrl", this.authUrl)
     return this.http.post<any>(this.authUrl + '/signin', userData).toPromise().then((response: ISigninDto) => {
       if (!response.accessToken) return false // Wrong data incoming
       this.baseHttpService.saveToken(response.accessToken)
