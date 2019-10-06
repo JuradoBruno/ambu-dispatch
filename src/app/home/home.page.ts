@@ -4,6 +4,7 @@ import MiniMap from 'leaflet-minimap';
 import 'leaflet-routing-machine';
 import 'leaflet-routing-machine-here';
 import '../services/moving-marker.service';
+import '../services/canvas-marker.service';
 // import "../services/AnimatedMarker.js"
 import route01 from "../services/route01.json"
 import route01Duration from "../services/route01-duration.json"
@@ -89,6 +90,8 @@ export class HomePage {
   };
   layersControlOptions: L.ControlOptions = { position: 'bottomright' };
   
+  canvasLayer: any;
+
   coinMoney: any;
   cashMoney: any;
   showConstructionTab: boolean;
@@ -139,7 +142,8 @@ export class HomePage {
   populateBuildingsMarker (buildings) {
     for (const building of buildings) {
       let newBuilding = L.marker([building.coordinates.x, building.coordinates.y], this.hopitalIcon)
-      newBuilding.addTo(this.map)
+      this.canvasLayer.addMarker(newBuilding)
+      // newBuilding.addTo(this.map)
     }
   }
   
@@ -177,16 +181,21 @@ export class HomePage {
     })
   }
 
-  onMapAlmostReady(map: L.Map) {
+    onMapAlmostReady(map: L.Map) {
     this.map = map
     setTimeout(() => {
       map.invalidateSize()
       this.onMapReady()
     }, 0)
+    
     map.removeControl(map.zoomControl)
   }
 
-  onMapReady() {    
+  onMapReady() {
+    console.log("TCL: HomePage -> onMapReady -> L", L)
+    
+    this.canvasLayer = L.canvasIconLayer({}).addTo(this.map)
+
     this.addMinimap()
     this.listenToUserState()
     this.listenToBuildingsState()
