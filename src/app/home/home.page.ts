@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
 import * as L from 'leaflet';
+import * as PIXI from 'pixi.js'
 import MiniMap from 'leaflet-minimap';
 import 'leaflet-routing-machine';
 import 'leaflet-routing-machine-here';
 import '../services/moving-marker.service';
 // import "../services/AnimatedMarker.js"
+import 'leaflet-pixi-overlay'
 import route01 from "../services/route01.json"
 import route01Duration from "../services/route01-duration.json"
 import { Router } from '@angular/router';
@@ -17,7 +19,7 @@ import { BuildingsStore } from '../core/stores/buildings.store';
 import { Building } from '../models/Buildings.model';
 import { BuildingsService } from '../core/services/buildings.service';
 import { IBuildingToUser } from '../models/User.model';
-
+(window as any).MyNamespace
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -83,12 +85,20 @@ export class HomePage {
   ////// MAIN MAP OPTIONS ///////
   mainMapOptions = {
     // layers: [this.streetMaps, this.hopital1, this.hopital2],
+    preferCanvas: true,
     layers: [this.streetMaps],
     zoom: 16,
     center: L.latLng([43.609598, 1.401405])
   };
   layersControlOptions: L.ControlOptions = { position: 'bottomright' };
   
+
+  pixiOverlay: any;
+  pixiContainer
+  // pixiContainer: PIXI.Container = new PIXI.Container()
+  pixiLoader: PIXI.Loader;
+  hopitalTexture: PIXI.Texture = PIXI.Texture.from('assets/icon/hopital-rond-strong.png')
+
   coinMoney: any;
   cashMoney: any;
   showConstructionTab: boolean;
@@ -137,10 +147,127 @@ export class HomePage {
   }
   
   populateBuildingsMarker (buildings) {
-    for (const building of buildings) {
-      let newBuilding = L.marker([building.coordinates.x, building.coordinates.y], this.hopitalIcon)
-      newBuilding.addTo(this.map)
+    let x = buildings[0].coordinates.x
+    let y = buildings[0].coordinates.y
+    let lastBuilding = buildings[0]
+    let newBuildings = []
+    for (let i = 0; i < 100; i++) {
+      let newBuilding = {...lastBuilding}
+      newBuilding.coordinates = this.randomGeo(lastBuilding.coordinates, 10000)
+      newBuildings.push(newBuilding)
     }
+    this.drawPIXIMarker(newBuildings)
+    for (const building of buildings) {
+      // let newBuilding = L.marker([building.coordinates.x, building.coordinates.y], this.hopitalIcon)
+      // newBuilding.addTo(this.map)
+    }
+  }
+
+  randomGeo(center, radius) {
+      var y0 = center.y;
+      var x0 = center.x;
+      var rd = radius / 111300;
+
+      var u = Math.random();
+      var v = Math.random();
+
+      var w = rd * Math.sqrt(u);
+      var t = 2 * Math.PI * v;
+      var x = w * Math.cos(t);
+      var y = w * Math.sin(t);
+
+      return {
+          y : y + y0,
+          x : x + x0
+      };
+  }
+
+  drawPIXIMarker(buildings) {
+    this.pixiLoader = PIXI.Loader.shared
+    // this.pixiLoader.add('marker', 'assets/icon/hopital-rond-strong.png');
+    this.pixiLoader.add('hopital1', 'assets/icon/hopital-rond-strong.png')
+
+    this.pixiLoader.load((loader, resources) => {
+      let textures = [resources.hopital1.texture]
+
+      let firstDraw = true;
+      let prevZoom;
+      let markerSprites = [];
+
+      let frame = null;
+      let focus = null;
+      this.pixiContainer = new PIXI.Container();
+      let doubleBuffering = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+      this.pixiOverlay = L.pixiOverlay(utils => {
+        var zoom = utils.getMap().getZoom();
+        if (frame) {
+          cancelAnimationFrame(frame);
+          frame = null;
+        }
+        var container = utils.getContainer();
+        var renderer = utils.getRenderer();
+        var project = utils.latLngToLayerPoint;
+        var scale = utils.getScale();
+        var invScale = 1 / scale;
+
+        if (firstDraw) {
+          prevZoom = zoom;
+
+          for (const [key, building] of Object.entries(buildings as Building[])) {
+            var coords = project([building.coordinates.x, building.coordinates.y]);
+            var markerSprite = new PIXI.Sprite(textures[0]);
+            // markerSprite.cacheAsBitmap = true
+            markerSprite.interactive = true;
+            markerSprite.buttonMode = true;
+            markerSprite.x = coords.x;
+            markerSprite.y = coords.y;
+            markerSprite.anchor.set(0.5, 0.5);
+            markerSprite.scale.set(invScale)
+            container.addChild(markerSprite);
+            markerSprites.push(markerSprite);         
+          }
+        }
+        if (firstDraw || prevZoom !== zoom) {
+          markerSprites.forEach(function(markerSprite) {
+            if (firstDraw) {
+              markerSprite.scale.set(invScale);
+            } else {
+              markerSprite.currentScale = markerSprite.scale.x;
+              markerSprite.targetScale = invScale;
+            }
+          });
+        }
+        var start = null;
+        var delta = 250;
+
+        function animate(timestamp) {
+          var progress;
+          if (start === null) start = timestamp;
+          progress = timestamp - start;
+          var lambda = progress / delta;
+          if (lambda > 1) lambda = 1;
+          lambda = lambda * (0.4 + lambda * (2.2 + lambda * -1.6));
+          markerSprites.forEach(function(markerSprite) {
+            markerSprite.scale.set(markerSprite.currentScale + lambda * (markerSprite.targetScale - markerSprite.currentScale));
+          });
+          renderer.render(container);
+          if (progress < delta) {
+            frame = requestAnimationFrame(animate);
+          }
+        }
+
+        if (!firstDraw && prevZoom !== zoom) {
+          frame = requestAnimationFrame(animate);
+        }
+        firstDraw = false;
+        prevZoom = zoom;
+        renderer.render(container);
+      }, this.pixiContainer, {
+        doubleBuffering: doubleBuffering
+      })
+      this.pixiOverlay.addTo(this.map)
+    })
   }
   
   listenToOrientationChange() {
@@ -180,13 +307,13 @@ export class HomePage {
   onMapAlmostReady(map: L.Map) {
     this.map = map
     setTimeout(() => {
-      map.invalidateSize()
+      this.map.invalidateSize()
       this.onMapReady()
     }, 0)
-    map.removeControl(map.zoomControl)
+    this.map.removeControl(this.map.zoomControl)
   }
 
-  onMapReady() {    
+  onMapReady() {
     this.addMinimap()
     this.listenToUserState()
     this.listenToBuildingsState()

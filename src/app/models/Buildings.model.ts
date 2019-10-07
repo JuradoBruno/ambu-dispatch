@@ -12,6 +12,10 @@ export class Building{
     employeeCapacity: number
     patientCapacity: number
     vehicleCapacity: number
+    coordinates?: {
+        x: number,
+        y: number
+    }
 
     constructor(building?: any) {
         Object.assign(this, building)
