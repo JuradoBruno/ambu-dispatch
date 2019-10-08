@@ -19,7 +19,7 @@ import { BuildingsStore } from '../core/stores/buildings.store';
 import { Building } from '../models/Buildings.model';
 import { BuildingsService } from '../core/services/buildings.service';
 import { IBuildingToUser } from '../models/User.model';
-(window as any).MyNamespace
+(<any>window).MSStream
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -38,7 +38,7 @@ export class HomePage {
   disableMissionButton = false
   firstMissionstarted = false
   missionIsRunning = false
-  
+
 
   redAmbuIcon = {
     icon: L.icon({
@@ -54,7 +54,7 @@ export class HomePage {
     icon: L.icon({
       iconSize: [73, 73],
       iconAnchor: [35, 41], // - margin-top, -margin-left
-      iconUrl: 'assets/icon/hopital-rond-strong.png'
+      iconUrl: 'assets/icon/iso-hospital-min.png'
     }
     )
   }
@@ -87,17 +87,19 @@ export class HomePage {
     // layers: [this.streetMaps, this.hopital1, this.hopital2],
     preferCanvas: true,
     layers: [this.streetMaps],
+    minZoom: 4,
+    maxZoom: 18,
     zoom: 16,
     center: L.latLng([43.609598, 1.401405])
   };
   layersControlOptions: L.ControlOptions = { position: 'bottomright' };
-  
 
+  mapIsReady = false
   pixiOverlay: any;
   pixiContainer
   // pixiContainer: PIXI.Container = new PIXI.Container()
   pixiLoader: PIXI.Loader;
-  hopitalTexture: PIXI.Texture = PIXI.Texture.from('assets/icon/hopital-rond-strong.png')
+  hopitalTexture: PIXI.Texture = PIXI.Texture.from('assets/icon/iso-hospital-min.png')
 
   coinMoney: any;
   cashMoney: any;
@@ -105,31 +107,44 @@ export class HomePage {
   buildings: Building[]
   buildingsToUser: IBuildingToUser[] = []
 
+  noOverlay = true
+  firstDraw = true
   isMouseDownToAddBuilding = false
   allowBuildingPlacement = false
   mouseDownToAddBuildingTimeout: any
   buildingToCreate: Building
 
-  constructor( 
+  constructor(
     private router: Router,
     private authService: AuthService,
     private userStore: UserStore,
     private buildingsService: BuildingsService,
     private buildingStore: BuildingsStore,
-    private componentStateStore: ComponentsStateStore) {}
+    private componentStateStore: ComponentsStateStore) { }
 
   ngOnInit() {
     let user = JSON.parse(localStorage.getItem('user')) // TO REMOVE
     if (user) this.userStore.storeCurrentUser(user) // TO REMOVE
     this.listenToOrientationChange()
-    this.listenToComponentsState()  
+    this.listenToComponentsState()
+    this.pixiLoader = PIXI.Loader.shared
+    this.pixiLoader.add('hopital1', 'assets/icon/iso-hospital-min.png', new PIXI.Circle(0, 0, 20))
+    this.drawPIXIMarker()
+    this.mapIsReady = true
   }
-  
+
   listenToUserState() {
     this.subs.sink = this.userStore.stateChanged.subscribe((state: IStoreState) => {
       this.coinMoney = state.user.coinMoney
       this.cashMoney = state.user.cashMoney
-      if (this.buildingsToUser.length < state.user.buildingsToUser.length) this.populateBuildingsMarker(state.user.buildingsToUser)
+      if ((this.buildingsToUser.length < state.user.buildingsToUser.length) && this.mapIsReady) {
+        this.firstDraw = true
+        console.log("TCL: HomePage -> listenToUserState -> firstDraw", this.firstDraw)
+        this.pixiLoader.reset()
+        this.pixiLoader.add('hopital1', 'assets/icon/iso-hospital-min.png')
+        this.drawPIXIMarker()
+      }
+
       this.buildingsToUser = state.user.buildingsToUser
     })
   }
@@ -139,24 +154,27 @@ export class HomePage {
       this.showConstructionTab = state.showConstuctionTab
     })
   }
-  
+
   listenToBuildingsState() {
     this.subs.sink = this.buildingStore.stateChanged.subscribe((state: IStoreState) => {
       this.buildings = state.buildings
     })
   }
-  
-  populateBuildingsMarker (buildings) {
-    let x = buildings[0].coordinates.x
-    let y = buildings[0].coordinates.y
-    let lastBuilding = buildings[0]
-    let newBuildings = []
-    for (let i = 0; i < 100; i++) {
-      let newBuilding = {...lastBuilding}
-      newBuilding.coordinates = this.randomGeo(lastBuilding.coordinates, 10000)
-      newBuildings.push(newBuilding)
-    }
-    this.drawPIXIMarker(newBuildings)
+
+  populateBuildingsMarker(buildings) {
+
+    // let x = buildings[0].coordinates.x
+    // let y = buildings[0].coordinates.y
+    // let lastBuilding = buildings[0]
+    // let newBuildings = []
+    // for (let i = 0; i < 1000; i++) {
+    //   let newBuilding = {...lastBuilding}
+    //   newBuilding.coordinates = this.randomGeo(lastBuilding.coordinates, 100000)
+    //   newBuildings.push(newBuilding)
+    // }
+    // this.drawPIXIMarker(newBuildings)
+    // this.drawPIXIMarker(buildings)
+
     for (const building of buildings) {
       // let newBuilding = L.marker([building.coordinates.x, building.coordinates.y], this.hopitalIcon)
       // newBuilding.addTo(this.map)
@@ -164,40 +182,42 @@ export class HomePage {
   }
 
   randomGeo(center, radius) {
-      var y0 = center.y;
-      var x0 = center.x;
-      var rd = radius / 111300;
+    var y0 = center.y;
+    var x0 = center.x;
+    var rd = radius / 111300;
 
-      var u = Math.random();
-      var v = Math.random();
+    var u = Math.random();
+    var v = Math.random();
 
-      var w = rd * Math.sqrt(u);
-      var t = 2 * Math.PI * v;
-      var x = w * Math.cos(t);
-      var y = w * Math.sin(t);
+    var w = rd * Math.sqrt(u);
+    var t = 2 * Math.PI * v;
+    var x = w * Math.cos(t);
+    var y = w * Math.sin(t);
 
-      return {
-          y : y + y0,
-          x : x + x0
-      };
+    return {
+      y: y + y0,
+      x: x + x0
+    };
   }
 
-  drawPIXIMarker(buildings) {
-    this.pixiLoader = PIXI.Loader.shared
-    // this.pixiLoader.add('marker', 'assets/icon/hopital-rond-strong.png');
-    this.pixiLoader.add('hopital1', 'assets/icon/hopital-rond-strong.png')
+
+  drawPIXIMarker() {
+    // var easing = BezierEasing(0, 0, 0.25, 1);
+
+    // this.pixiLoader.add('marker', 'assets/icon/iso-hospital-min.png');
 
     this.pixiLoader.load((loader, resources) => {
+      console.log("TCL: HomePage -> drawPIXIMarker -> loader", loader)
       let textures = [resources.hopital1.texture]
 
-      let firstDraw = true;
       let prevZoom;
       let markerSprites = [];
 
       let frame = null;
       let focus = null;
       this.pixiContainer = new PIXI.Container();
-      let doubleBuffering = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      let doubleBuffering = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      // let doubleBuffering = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
       this.pixiOverlay = L.pixiOverlay(utils => {
         var zoom = utils.getMap().getZoom();
@@ -209,12 +229,16 @@ export class HomePage {
         var renderer = utils.getRenderer();
         var project = utils.latLngToLayerPoint;
         var scale = utils.getScale();
-        var invScale = 1 / scale;
+        var invScale = 1 / (scale - 0.5);
+        console.log("TCL: HomePage -> drawPIXIMarker -> scale", scale)
+        // var invScale = 0.05;
+        console.log("TCL: HomePage -> drawPIXIMarker -> invScale", invScale)
 
-        if (firstDraw) {
+
+        if (this.firstDraw) {
           prevZoom = zoom;
 
-          for (const [key, building] of Object.entries(buildings as Building[])) {
+          for (const [key, building] of Object.entries(this.buildingsToUser as IBuildingToUser[])) {
             var coords = project([building.coordinates.x, building.coordinates.y]);
             var markerSprite = new PIXI.Sprite(textures[0]);
             // markerSprite.cacheAsBitmap = true
@@ -225,12 +249,12 @@ export class HomePage {
             markerSprite.anchor.set(0.5, 0.5);
             markerSprite.scale.set(invScale)
             container.addChild(markerSprite);
-            markerSprites.push(markerSprite);         
+            markerSprites.push(markerSprite);
           }
         }
-        if (firstDraw || prevZoom !== zoom) {
-          markerSprites.forEach(function(markerSprite) {
-            if (firstDraw) {
+        if (this.firstDraw || prevZoom !== zoom) {
+          markerSprites.forEach(markerSprite => {
+            if (this.firstDraw) {
               markerSprite.scale.set(invScale);
             } else {
               markerSprite.currentScale = markerSprite.scale.x;
@@ -240,6 +264,7 @@ export class HomePage {
         }
         var start = null;
         var delta = 250;
+        // var delta = 10;
 
         function animate(timestamp) {
           var progress;
@@ -248,7 +273,7 @@ export class HomePage {
           var lambda = progress / delta;
           if (lambda > 1) lambda = 1;
           lambda = lambda * (0.4 + lambda * (2.2 + lambda * -1.6));
-          markerSprites.forEach(function(markerSprite) {
+          markerSprites.forEach(function (markerSprite) {
             markerSprite.scale.set(markerSprite.currentScale + lambda * (markerSprite.targetScale - markerSprite.currentScale));
           });
           renderer.render(container);
@@ -257,25 +282,26 @@ export class HomePage {
           }
         }
 
-        if (!firstDraw && prevZoom !== zoom) {
+        if (!this.firstDraw && prevZoom !== zoom && scale > 8) {
           frame = requestAnimationFrame(animate);
         }
-        firstDraw = false;
+        this.firstDraw = false;
         prevZoom = zoom;
         renderer.render(container);
       }, this.pixiContainer, {
         doubleBuffering: doubleBuffering
       })
-      this.pixiOverlay.addTo(this.map)
+      if (this.noOverlay) this.pixiOverlay.addTo(this.map)
+      this.noOverlay = false
     })
   }
-  
+
   listenToOrientationChange() {
-    window.addEventListener("orientationchange", () => {    
-      this.updateMarginBottomMinimap()
-    }, true);
+    // window.addEventListener("orientationchange", () => {    
+    //   this.updateMarginBottomMinimap()
+    // }, true);
   }
-  
+
   openConstructionTab() {
     this.componentStateStore.changeComponentState(ComponentStateActions.OpenConstructionTab)
   }
@@ -288,7 +314,14 @@ export class HomePage {
     this.componentStateStore.changeComponentState(ComponentStateActions.CloseConstructionTab)
     this.buildingToCreate = building
 
+    // this.listenToMouseEvent()
+    this.listenToTouchEvent()
+
+  }
+
+  listenToMouseEvent() {
     this.map.on('mousedown', event => {
+      console.log("TCL: HomePage -> startBuildingPlacement -> mousedown")
       this.isMouseDownToAddBuilding = true
       this.mouseDownToAddBuildingTimeout = setTimeout(() => {
         this.buildingsService.addBuilding(event.latlng, this.buildingToCreate)
@@ -298,10 +331,32 @@ export class HomePage {
     })
 
     this.map.on('mouseup', event => {
+      console.log("TCL: HomePage -> startBuildingPlacement -> mouseup")
       if (this.isMouseDownToAddBuilding) {
         clearTimeout(this.mouseDownToAddBuildingTimeout)
       }
     })
+  }
+
+  listenToTouchEvent() {
+    console.log("TCL: HomePage -> listenToTouchEvent -> listenToTouchEvent")
+    this.map.on('mousedown touchstart', event => {
+      console.log("TCL: HomePage -> listenToTouchEvent -> mousedown touchstart")
+      this.isMouseDownToAddBuilding = true
+      this.mouseDownToAddBuildingTimeout = setTimeout(() => {
+        this.buildingsService.addBuilding(event.latlng, this.buildingToCreate)
+        this.map.off('mousedown touchstart')
+        this.map.off('touchend')
+      }, 200);
+    })
+
+    this.map.on('touchend', event => {
+      console.log("TCL: HomePage -> listenToTouchEvent -> touchend")
+      if (this.isMouseDownToAddBuilding) {
+        clearTimeout(this.mouseDownToAddBuildingTimeout)
+      }
+    })
+
   }
 
   onMapAlmostReady(map: L.Map) {
@@ -314,35 +369,36 @@ export class HomePage {
   }
 
   onMapReady() {
+    // this.mapIsReady = true
     this.addMinimap()
     this.listenToUserState()
     this.listenToBuildingsState()
     // this.addRouting()
   }
 
-  continueMission () {
-    this.missionIsRunning = true 
+  continueMission() {
+    this.missionIsRunning = true
     for (const marker of this.movingMarkers) marker.start()
   }
 
-  pauseMission () {
+  pauseMission() {
     this.missionIsRunning = false
     for (const marker of this.movingMarkers) marker.pause()
   }
 
   addMinimap() {
-    let rect1 = {color: "#f04141", weight: 2};
-    let rect2 = {color: "#0000AA", weight: 1, opacity:0, fillOpacity:0};
-    
+    let rect1 = { color: "#f04141", weight: 2 };
+    let rect2 = { color: "#0000AA", weight: 1, opacity: 0, fillOpacity: 0 };
+
     let osm = new L.TileLayer(this.osmStreetMap)
-    this.miniMap = new MiniMap(osm, { 
-      minZoom: 0, 
-      maxZoom: 13, 
-      toggleDisplay: true, 
+    this.miniMap = new MiniMap(osm, {
+      minZoom: 0,
+      maxZoom: 13,
+      toggleDisplay: true,
       minimized: false,
       collapsedWidth: 50,
       collapsedHeight: 50,
-      aimingRectOptions : rect1,
+      aimingRectOptions: rect1,
       shadowRectOptions: rect2,
       height: 120,
       width: 120
@@ -352,7 +408,7 @@ export class HomePage {
     // this.updateMarginBottomMinimap()
   }
 
-  setMinimapStyles (styles) {
+  setMinimapStyles(styles) {
     styles.border = "2px solid #f04141"
     styles.boxShadow = "8px 6px 8px -4px rgba(0,0,0,0.75)"
     styles.borderRadius = "5px"
@@ -376,7 +432,7 @@ export class HomePage {
       ],
       router: new L.Routing.Here('Wggb4j1DYHP72PKLC4Ij', 'VU2EFLLwNPnRdsGj06bBDw')
     }).addTo(this.map)
-    
+
     control.on('routeselected', event => {
       let coords = event.route.coordinates;
       let instr = event.route.instructions;

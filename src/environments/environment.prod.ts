@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  baseUrl: 'ambu-dispatch-recette.eu-west-1.elasticbeanstalk.com/',
+  baseUrl: 'https://ambu-recette-api.brunojurado.com/',
   hmr: false
 };
