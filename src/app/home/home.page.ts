@@ -95,8 +95,14 @@ export class HomePage {
   layersControlOptions: L.ControlOptions = { position: 'bottomright' };
 
   mapIsReady = false
+  frame = null
+  start = null
+  progress = null
+  renderer: any;
+  container: any;
   pixiOverlay: any;
-  pixiContainer
+  pixiContainer: any;
+  markerSprites: any[] = []
   // pixiContainer: PIXI.Container = new PIXI.Container()
   pixiLoader: PIXI.Loader;
   hopitalTexture: PIXI.Texture = PIXI.Texture.from('assets/icon/iso-hospital-min.png')
@@ -139,7 +145,6 @@ export class HomePage {
       this.cashMoney = state.user.cashMoney
       if ((this.buildingsToUser.length < state.user.buildingsToUser.length) && this.mapIsReady) {
         this.firstDraw = true
-        console.log("TCL: HomePage -> listenToUserState -> firstDraw", this.firstDraw)
         this.pixiLoader.reset()
         this.pixiLoader.add('hopital1', 'assets/icon/iso-hospital-min.png')
         this.drawPIXIMarker()
@@ -207,92 +212,98 @@ export class HomePage {
     // this.pixiLoader.add('marker', 'assets/icon/iso-hospital-min.png');
 
     this.pixiLoader.load((loader, resources) => {
-      console.log("TCL: HomePage -> drawPIXIMarker -> loader", loader)
       let textures = [resources.hopital1.texture]
 
       let prevZoom;
-      let markerSprites = [];
 
-      let frame = null;
+      this.frame = null;
       let focus = null;
       this.pixiContainer = new PIXI.Container();
       let doubleBuffering = /iPad|iPhone|iPod/.test(navigator.userAgent);
       // let doubleBuffering = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-      this.pixiOverlay = L.pixiOverlay(utils => {
-        var zoom = utils.getMap().getZoom();
-        if (frame) {
-          cancelAnimationFrame(frame);
-          frame = null;
+      this.pixiOverlay = L.pixiOverlay((utils, event) => {
+        let zoom = utils.getMap().getZoom();
+        if (this.frame) {
+          cancelAnimationFrame(this.frame);
+          this.frame = null;
         }
-        var container = utils.getContainer();
-        var renderer = utils.getRenderer();
-        var project = utils.latLngToLayerPoint;
-        var scale = utils.getScale();
-        var invScale = 1 / (scale - 0.5);
-        console.log("TCL: HomePage -> drawPIXIMarker -> scale", scale)
-        // var invScale = 0.05;
-        console.log("TCL: HomePage -> drawPIXIMarker -> invScale", invScale)
-
+        
+        this.container = utils.getContainer();
+        this.renderer = utils.getRenderer();
+        let project = utils.latLngToLayerPoint;
+        let scale = utils.getScale();
+        let invScale = 1 / scale;
+        if (scale === 128) invScale = 0.005;
+        if (scale === 32) invScale = 0.01;
+        if (scale <= 8) invScale = 0.025;
 
         if (this.firstDraw) {
           prevZoom = zoom;
-
+          this.markerSprites = []
           for (const [key, building] of Object.entries(this.buildingsToUser as IBuildingToUser[])) {
-            var coords = project([building.coordinates.x, building.coordinates.y]);
-            var markerSprite = new PIXI.Sprite(textures[0]);
-            // markerSprite.cacheAsBitmap = true
+            let coords = project([building.coordinates.x, building.coordinates.y]);
+            let markerSprite = new PIXI.Sprite(textures[0]);
+            markerSprite.cacheAsBitmap = true
             markerSprite.interactive = true;
             markerSprite.buttonMode = true;
             markerSprite.x = coords.x;
             markerSprite.y = coords.y;
             markerSprite.anchor.set(0.5, 0.5);
             markerSprite.scale.set(invScale)
-            container.addChild(markerSprite);
-            markerSprites.push(markerSprite);
+            this.container.addChild(markerSprite);
+            this.markerSprites.push(markerSprite);
           }
         }
         if (this.firstDraw || prevZoom !== zoom) {
-          markerSprites.forEach(markerSprite => {
+          for (const markerSprite of this.markerSprites) {
             if (this.firstDraw) {
               markerSprite.scale.set(invScale);
             } else {
               markerSprite.currentScale = markerSprite.scale.x;
               markerSprite.targetScale = invScale;
-            }
-          });
-        }
-        var start = null;
-        var delta = 250;
-        // var delta = 10;
-
-        function animate(timestamp) {
-          var progress;
-          if (start === null) start = timestamp;
-          progress = timestamp - start;
-          var lambda = progress / delta;
-          if (lambda > 1) lambda = 1;
-          lambda = lambda * (0.4 + lambda * (2.2 + lambda * -1.6));
-          markerSprites.forEach(function (markerSprite) {
-            markerSprite.scale.set(markerSprite.currentScale + lambda * (markerSprite.targetScale - markerSprite.currentScale));
-          });
-          renderer.render(container);
-          if (progress < delta) {
-            frame = requestAnimationFrame(animate);
-          }
+            }            
+          }         
         }
 
-        if (!this.firstDraw && prevZoom !== zoom && scale > 8) {
-          frame = requestAnimationFrame(animate);
+        if (!this.firstDraw && prevZoom !== zoom) {
+          this.start = null
+          this.progress = null
+          this.frame = requestAnimationFrame(this.animateMarker.bind(this));
         }
         this.firstDraw = false;
         prevZoom = zoom;
-        renderer.render(container);
+        this.renderer.render(this.container);
       }, this.pixiContainer, {
         doubleBuffering: doubleBuffering
       })
       if (this.noOverlay) this.pixiOverlay.addTo(this.map)
       this.noOverlay = false
+    })
+  }
+
+  animateMarker(timestamp) {
+    let delta = 250
+    if (this.start === null) this.start = timestamp;
+    this.progress = timestamp - this.start;
+    let lambda = this.progress / delta;
+    if (lambda > 1) lambda = 1;
+    lambda = lambda * (0.4 + lambda * (2.2 + lambda * -1.6));
+    for (const markerSprite of this.markerSprites) {
+      markerSprite.scale.set(markerSprite.currentScale + lambda * (markerSprite.targetScale - markerSprite.currentScale));
+    }
+    this.renderer.render(this.container);
+    if (this.progress < delta) {
+      this.frame = requestAnimationFrame(this.animateMarker.bind(this));
+    }
+  }
+
+  listenToZoom() {
+    this.map.on('zoomstart', event => {
+      
+    })
+    this.map.on('zoomend', event => {
+      
     })
   }
 
@@ -321,7 +332,6 @@ export class HomePage {
 
   listenToMouseEvent() {
     this.map.on('mousedown', event => {
-      console.log("TCL: HomePage -> startBuildingPlacement -> mousedown")
       this.isMouseDownToAddBuilding = true
       this.mouseDownToAddBuildingTimeout = setTimeout(() => {
         this.buildingsService.addBuilding(event.latlng, this.buildingToCreate)
@@ -331,7 +341,6 @@ export class HomePage {
     })
 
     this.map.on('mouseup', event => {
-      console.log("TCL: HomePage -> startBuildingPlacement -> mouseup")
       if (this.isMouseDownToAddBuilding) {
         clearTimeout(this.mouseDownToAddBuildingTimeout)
       }
@@ -339,9 +348,7 @@ export class HomePage {
   }
 
   listenToTouchEvent() {
-    console.log("TCL: HomePage -> listenToTouchEvent -> listenToTouchEvent")
     this.map.on('mousedown touchstart', event => {
-      console.log("TCL: HomePage -> listenToTouchEvent -> mousedown touchstart")
       this.isMouseDownToAddBuilding = true
       this.mouseDownToAddBuildingTimeout = setTimeout(() => {
         this.buildingsService.addBuilding(event.latlng, this.buildingToCreate)
@@ -351,7 +358,6 @@ export class HomePage {
     })
 
     this.map.on('touchend', event => {
-      console.log("TCL: HomePage -> listenToTouchEvent -> touchend")
       if (this.isMouseDownToAddBuilding) {
         clearTimeout(this.mouseDownToAddBuildingTimeout)
       }
@@ -373,6 +379,7 @@ export class HomePage {
     this.addMinimap()
     this.listenToUserState()
     this.listenToBuildingsState()
+    this.listenToZoom()
     // this.addRouting()
   }
 
