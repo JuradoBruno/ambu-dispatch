@@ -62,9 +62,11 @@ export class HomePage {
   // Define our base layers so we can reference them multiple times
   streetMaps = L.tileLayer(this.osmStreetMap, {
     detectRetina: true,
+    maxZoom: 19
   });
   wMaps = L.tileLayer(this.osmWiki, {
     detectRetina: true,
+    maxZoom: 19
   });
 
   // Marker for the parking lot at the base of Mt. Ranier trails
@@ -87,15 +89,16 @@ export class HomePage {
   mainMapOptions = {
     // layers: [this.streetMaps, this.hopital1, this.hopital2],
     preferCanvas: true,
-    layers: [this.streetMaps],
+    layers: [this.wMaps],
     minZoom: 4,
     maxZoom: 18,
+    maxNativeZoom: 18,
     zoom: 15,
-    bounceAtZoomLimits: true,
+    bounceAtZoomLimits: false,
     center: L.latLng([43.609598, 1.401405]),
   };
-  layersControlOptions: L.ControlOptions = { position: 'bottomright' };
 
+  desiredScale = 0
   lastEvent = null
   utils = null
   mapIsReady = false
@@ -177,6 +180,7 @@ export class HomePage {
   }
 
   instanciatePixiOverlay() {
+    
     this.pixiOverlay = L.pixiOverlay((utils, event) => {
         this.lastEvent = event
         this.utils = utils
@@ -185,16 +189,18 @@ export class HomePage {
           cancelAnimationFrame(this.frame);
           this.frame = null;
         }
-
+        
         this.container = utils.getContainer();
         // this.container.cacheAsBitmap = true
         this.renderer = utils.getRenderer();
         let project = utils.latLngToLayerPoint;
         let scale = utils.getScale();
-        let invScale = 1 / scale;
-        if (scale === 128) invScale = 0.002;
-        if (scale === 32) invScale = 0.008;
-        if (scale < 32) invScale = 0.025;
+        if (zoom >= 17) this.desiredScale = 0.003;
+        if (zoom == 16) this.desiredScale = 0.005;
+        if (zoom == 15) this.desiredScale = 0.008;
+        if (zoom == 14) this.desiredScale = 0.010;
+        if (zoom == 13) this.desiredScale = 0.013;
+        if ( zoom < 13) this.desiredScale = 0.015;
         
         if (this.firstDraw) {
           this.prevZoom = zoom;
@@ -207,7 +213,7 @@ export class HomePage {
             markerSprite.x = coords.x;
             markerSprite.y = coords.y;
             markerSprite.anchor.set(0.5, 0.5);
-            markerSprite.scale.set(invScale)
+            markerSprite.scale.set(this.desiredScale)
             markerSprite.id = building.buildingsToUserId
             this.container.addChild(markerSprite);
             this.markerSprites.push(markerSprite);
@@ -217,10 +223,10 @@ export class HomePage {
         if (this.firstDraw || this.prevZoom !== zoom) {
           for (const markerSprite of this.markerSprites) {
             if (this.firstDraw) {
-              markerSprite.scale.set(invScale);
+              markerSprite.scale.set(this.desiredScale);
             } else {
               markerSprite.currentScale = markerSprite.scale.x;
-              markerSprite.targetScale = invScale;
+              markerSprite.targetScale = this.desiredScale;
             }
           }
         }
@@ -310,9 +316,10 @@ export class HomePage {
     this.map = map
     setTimeout(() => {
       this.map.invalidateSize()
+      this.map.removeControl(this.map.zoomControl)
+      new L.Control.Zoom({ position: 'bottomleft' }).addTo(this.map)
       this.onMapReady()
     }, 0)
-    this.map.removeControl(this.map.zoomControl)
   }
 
   onMapReady() {
