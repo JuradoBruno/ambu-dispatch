@@ -96,16 +96,19 @@ export class HomePage {
   };
   layersControlOptions: L.ControlOptions = { position: 'bottomright' };
 
+  lastEvent = null
+  utils = null
   mapIsReady = false
   frame = null
   start = null
   progress = null
+  prevZoom = null
   renderer: any;
   container: any;
   pixiOverlay: any;
   markerSprites: any[] = []
   pixiContainer: PIXI.Container = new PIXI.Container()
-  pixiLoader: PIXI.Loader;
+  pixiLoader = new PIXI.Loader();
   hopitalTexture: PIXI.Texture = PIXI.Texture.from('assets/icon/iso-hospital-min.png')
 
   coinMoney: any;
@@ -115,7 +118,6 @@ export class HomePage {
   buildingsToUser: IBuildingToUser[] = []
   buildingsToUserToAddToRendering: IBuildingToUser[] = []
 
-  noOverlay = true
   firstDraw = true
   isMouseDownToAddBuilding = false
   allowBuildingPlacement = false
@@ -133,12 +135,8 @@ export class HomePage {
   ngOnInit() {
     let user = JSON.parse(localStorage.getItem('user')) // TO REMOVE
     if (user) this.userStore.storeCurrentUser(user) // TO REMOVE
-    this.listenToOrientationChange()
     this.listenToComponentsState()
-    this.pixiLoader = new PIXI.Loader()
     this.pixiLoader.add('hopital1', 'assets/icon/iso-hospital-min.png', new PIXI.Circle(0, 0, 20))
-    this.initMarkersContainer()
-    this.drawPIXIMarker()
     this.mapIsReady = true
   }
 
@@ -148,19 +146,19 @@ export class HomePage {
       this.cashMoney = state.user.cashMoney
       if ((this.buildingsToUser.length < state.user.buildingsToUser.length) && this.mapIsReady) {
         this.firstDraw = true
-        this.pixiLoader.reset()
-        this.pixiLoader.add('hopital1', 'assets/icon/iso-hospital-min.png')
-        if (this.buildingsToUserToAddToRendering.length == 0 && this.noOverlay) {
+        if (this.buildingsToUserToAddToRendering.length == 0) {
           this.buildingsToUserToAddToRendering = state.user.buildingsToUser
         }
         else {
           let newBuilding = _.maxBy(state.user.buildingsToUser, 'createdAt') // Getting only the last one
           this.buildingsToUserToAddToRendering = [newBuilding]
         }
-        this.buildingsToUser = state.user.buildingsToUser
-        this.drawPIXIMarker()
-        if (this.pixiOverlay) this.pixiOverlay.redraw({ type: 'redraw' })
-        return
+        // this.buildingsToUser = state.user.buildingsToUser
+        // this.drawPIXIMarker()
+        if (this.pixiOverlay){
+          this.pixiOverlay.redraw(this.utils, this.lastEvent)
+        } 
+        // return
       }
       this.buildingsToUser = state.user.buildingsToUser
     })
@@ -178,65 +176,10 @@ export class HomePage {
     })
   }
 
-  populateBuildingsMarker(buildings) {
-
-    // let x = buildings[0].coordinates.x
-    // let y = buildings[0].coordinates.y
-    // let lastBuilding = buildings[0]
-    // let newBuildings = []
-    // for (let i = 0; i < 1000; i++) {
-    //   let newBuilding = {...lastBuilding}
-    //   newBuilding.coordinates = this.randomGeo(lastBuilding.coordinates, 100000)
-    //   newBuildings.push(newBuilding)
-    // }
-    // this.drawPIXIMarker(newBuildings)
-    // this.drawPIXIMarker(buildings)
-
-    for (const building of buildings) {
-      // let newBuilding = L.marker([building.coordinates.x, building.coordinates.y], this.hopitalIcon)
-      // newBuilding.addTo(this.map)
-    }
-  }
-
-  randomGeo(center, radius) {
-    var y0 = center.y;
-    var x0 = center.x;
-    var rd = radius / 111300;
-
-    var u = Math.random();
-    var v = Math.random();
-
-    var w = rd * Math.sqrt(u);
-    var t = 2 * Math.PI * v;
-    var x = w * Math.cos(t);
-    var y = w * Math.sin(t);
-
-    return {
-      y: y + y0,
-      x: x + x0
-    };
-  }
-
-  initMarkersContainer() {
-
-  }
-
-  drawPIXIMarker() {
-    // var easing = BezierEasing(0, 0, 0.25, 1);
-
-    // this.pixiLoader.add('marker', 'assets/icon/iso-hospital-min.png');
-
-    this.pixiLoader.load((loader, resources) => {
-      let textures = [resources.hopital1.texture]
-
-      let prevZoom;
-
-      this.frame = null;
-      let focus = null;
-      let doubleBuffering = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      // let doubleBuffering = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-      this.pixiOverlay = L.pixiOverlay((utils, event) => {
+  instanciatePixiOverlay() {
+    this.pixiOverlay = L.pixiOverlay((utils, event) => {
+        this.lastEvent = event
+        this.utils = utils
         let zoom = utils.getMap().getZoom();
         if (this.frame) {
           cancelAnimationFrame(this.frame);
@@ -244,6 +187,7 @@ export class HomePage {
         }
 
         this.container = utils.getContainer();
+        // this.container.cacheAsBitmap = true
         this.renderer = utils.getRenderer();
         let project = utils.latLngToLayerPoint;
         let scale = utils.getScale();
@@ -253,10 +197,10 @@ export class HomePage {
         if (scale < 32) invScale = 0.025;
         
         if (this.firstDraw) {
-          prevZoom = zoom;
+          this.prevZoom = zoom;
           for (const building of this.buildingsToUserToAddToRendering) {
             let coords = project([building.coordinates.x, building.coordinates.y]);
-            let markerSprite = new PIXI.Sprite(textures[0]);
+            let markerSprite = new PIXI.Sprite(this.hopitalTexture);
             markerSprite.cacheAsBitmap = true
             markerSprite.interactive = true;
             markerSprite.buttonMode = true;
@@ -270,7 +214,7 @@ export class HomePage {
           }
           this.buildingsToUserToAddToRendering = []
         }
-        if (this.firstDraw || prevZoom !== zoom) {
+        if (this.firstDraw || this.prevZoom !== zoom) {
           for (const markerSprite of this.markerSprites) {
             if (this.firstDraw) {
               markerSprite.scale.set(invScale);
@@ -281,19 +225,33 @@ export class HomePage {
           }
         }
 
-        if (!this.firstDraw && prevZoom !== zoom) {
+        if (!this.firstDraw && this.prevZoom !== zoom) {
           this.start = null
           this.progress = null
           this.frame = requestAnimationFrame(this.animateMarker.bind(this));
         }
         this.firstDraw = false;
-        prevZoom = zoom;
+        this.prevZoom = zoom;
         this.renderer.render(this.container);
       }, this.pixiContainer, {
-        doubleBuffering: doubleBuffering
+        doubleBuffering: false
       })
-      if (this.noOverlay) this.pixiOverlay.addTo(this.map)
-      this.noOverlay = false
+
+      this.pixiOverlay.addTo(this.map)
+  }
+
+  drawPIXIMarker() {
+    // var easing = BezierEasing(0, 0, 0.25, 1);
+
+    this.pixiLoader.load((loader, resources) => {
+
+      let prevZoom;
+
+      this.frame = null;
+      let focus = null;
+      let doubleBuffering = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      this.instanciatePixiOverlay()
+      // let doubleBuffering = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     })
   }
 
@@ -320,12 +278,6 @@ export class HomePage {
     this.map.on('zoomend', event => {
       // cancelAnimationFrame(this.frame)
     })
-  }
-
-  listenToOrientationChange() {
-    // window.addEventListener("orientationchange", () => {    
-    //   this.updateMarginBottomMinimap()
-    // }, true);
   }
 
   openConstructionTab() {
@@ -364,6 +316,7 @@ export class HomePage {
   }
 
   onMapReady() {
+    this.drawPIXIMarker()
     // this.mapIsReady = true
     this.addMinimap()
     this.listenToUserState()
