@@ -1,7 +1,7 @@
 
 <ion-content>
   <div class="main-container">
-    <div class="map-container">
+    <div class="map-container" (press)="onPress($event)" (pressup)="onPressUp($event)">
   
       <div leaflet
           class="main-map"

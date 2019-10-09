@@ -90,7 +90,7 @@ export class HomePage {
     layers: [this.streetMaps],
     minZoom: 4,
     maxZoom: 18,
-    zoom: 16,
+    zoom: 15,
     bounceAtZoomLimits: true,
     center: L.latLng([43.609598, 1.401405]),
   };
@@ -151,7 +151,7 @@ export class HomePage {
         this.pixiLoader.reset()
         this.pixiLoader.add('hopital1', 'assets/icon/iso-hospital-min.png')
         if (this.buildingsToUserToAddToRendering.length == 0 && this.noOverlay) {
-          this.buildingsToUserToAddToRendering = state.user.buildingsToUser  
+          this.buildingsToUserToAddToRendering = state.user.buildingsToUser
         }
         else {
           let newBuilding = _.maxBy(state.user.buildingsToUser, 'createdAt') // Getting only the last one
@@ -159,7 +159,7 @@ export class HomePage {
         }
         this.buildingsToUser = state.user.buildingsToUser
         this.drawPIXIMarker()
-        if (this.pixiOverlay) this.pixiOverlay.redraw({type: 'redraw'})
+        if (this.pixiOverlay) this.pixiOverlay.redraw({ type: 'redraw' })
         return
       }
       this.buildingsToUser = state.user.buildingsToUser
@@ -242,7 +242,7 @@ export class HomePage {
           cancelAnimationFrame(this.frame);
           this.frame = null;
         }
-        
+
         this.container = utils.getContainer();
         this.renderer = utils.getRenderer();
         let project = utils.latLngToLayerPoint;
@@ -250,8 +250,8 @@ export class HomePage {
         let invScale = 1 / scale;
         if (scale === 128) invScale = 0.002;
         if (scale === 32) invScale = 0.008;
-        if (scale <= 8) invScale = 0.025;
-
+        if (scale < 32) invScale = 0.025;
+        
         if (this.firstDraw) {
           prevZoom = zoom;
           for (const building of this.buildingsToUserToAddToRendering) {
@@ -277,8 +277,8 @@ export class HomePage {
             } else {
               markerSprite.currentScale = markerSprite.scale.x;
               markerSprite.targetScale = invScale;
-            }            
-          }         
+            }
+          }
         }
 
         if (!this.firstDraw && prevZoom !== zoom) {
@@ -339,25 +339,19 @@ export class HomePage {
   startBuildingPlacement(building) {
     this.componentStateStore.changeComponentState(ComponentStateActions.CloseConstructionTab)
     this.buildingToCreate = building
-
-    this.listenToMouseEvent()
+    this.allowBuildingPlacement = true
   }
 
-  listenToMouseEvent() {
-    this.map.on('mousedown', event => {
-      this.isMouseDownToAddBuilding = true
-      this.mouseDownToAddBuildingTimeout = setTimeout(() => {
-        this.buildingsService.addBuilding(event.latlng, this.buildingToCreate)
-        this.map.off('mousedown')
-        this.map.off('mouseup')
-      }, 200);
-    })
+  // Used to create buildings
+  onPress($event) {
+    if (!this.allowBuildingPlacement) return
+    let latlng = this.map.mouseEventToLatLng($event.srcEvent)
+    this.buildingsService.addBuilding(latlng, this.buildingToCreate)
+    this.allowBuildingPlacement = false
+  }
 
-    this.map.on('mouseup', event => {
-      if (this.isMouseDownToAddBuilding) {
-        clearTimeout(this.mouseDownToAddBuildingTimeout)
-      }
-    })
+  onPressUp($event) {
+
   }
 
   onMapAlmostReady(map: L.Map) {
