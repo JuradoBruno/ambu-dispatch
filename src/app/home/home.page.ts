@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import * as L from 'leaflet';
 import * as PIXI from 'pixi.js'
+import * as _ from 'lodash'
 import MiniMap from 'leaflet-minimap';
 import 'leaflet-routing-machine';
 import 'leaflet-routing-machine-here';
@@ -90,7 +91,8 @@ export class HomePage {
     minZoom: 4,
     maxZoom: 18,
     zoom: 16,
-    center: L.latLng([43.609598, 1.401405])
+    bounceAtZoomLimits: true,
+    center: L.latLng([43.609598, 1.401405]),
   };
   layersControlOptions: L.ControlOptions = { position: 'bottomright' };
 
@@ -101,9 +103,8 @@ export class HomePage {
   renderer: any;
   container: any;
   pixiOverlay: any;
-  pixiContainer: any;
   markerSprites: any[] = []
-  // pixiContainer: PIXI.Container = new PIXI.Container()
+  pixiContainer: PIXI.Container = new PIXI.Container()
   pixiLoader: PIXI.Loader;
   hopitalTexture: PIXI.Texture = PIXI.Texture.from('assets/icon/iso-hospital-min.png')
 
@@ -112,6 +113,7 @@ export class HomePage {
   showConstructionTab: boolean;
   buildings: Building[]
   buildingsToUser: IBuildingToUser[] = []
+  buildingsToUserToAddToRendering: IBuildingToUser[] = []
 
   noOverlay = true
   firstDraw = true
@@ -133,8 +135,9 @@ export class HomePage {
     if (user) this.userStore.storeCurrentUser(user) // TO REMOVE
     this.listenToOrientationChange()
     this.listenToComponentsState()
-    this.pixiLoader = PIXI.Loader.shared
+    this.pixiLoader = new PIXI.Loader()
     this.pixiLoader.add('hopital1', 'assets/icon/iso-hospital-min.png', new PIXI.Circle(0, 0, 20))
+    this.initMarkersContainer()
     this.drawPIXIMarker()
     this.mapIsReady = true
   }
@@ -147,9 +150,18 @@ export class HomePage {
         this.firstDraw = true
         this.pixiLoader.reset()
         this.pixiLoader.add('hopital1', 'assets/icon/iso-hospital-min.png')
+        if (this.buildingsToUserToAddToRendering.length == 0 && this.noOverlay) {
+          this.buildingsToUserToAddToRendering = state.user.buildingsToUser  
+        }
+        else {
+          let newBuilding = _.maxBy(state.user.buildingsToUser, 'createdAt') // Getting only the last one
+          this.buildingsToUserToAddToRendering = [newBuilding]
+        }
+        this.buildingsToUser = state.user.buildingsToUser
         this.drawPIXIMarker()
+        if (this.pixiOverlay) this.pixiOverlay.redraw({type: 'redraw'})
+        return
       }
-
       this.buildingsToUser = state.user.buildingsToUser
     })
   }
@@ -205,6 +217,9 @@ export class HomePage {
     };
   }
 
+  initMarkersContainer() {
+
+  }
 
   drawPIXIMarker() {
     // var easing = BezierEasing(0, 0, 0.25, 1);
@@ -218,7 +233,6 @@ export class HomePage {
 
       this.frame = null;
       let focus = null;
-      this.pixiContainer = new PIXI.Container();
       let doubleBuffering = /iPad|iPhone|iPod/.test(navigator.userAgent);
       // let doubleBuffering = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
@@ -234,14 +248,13 @@ export class HomePage {
         let project = utils.latLngToLayerPoint;
         let scale = utils.getScale();
         let invScale = 1 / scale;
-        if (scale === 128) invScale = 0.005;
-        if (scale === 32) invScale = 0.01;
+        if (scale === 128) invScale = 0.002;
+        if (scale === 32) invScale = 0.008;
         if (scale <= 8) invScale = 0.025;
 
         if (this.firstDraw) {
           prevZoom = zoom;
-          this.markerSprites = []
-          for (const [key, building] of Object.entries(this.buildingsToUser as IBuildingToUser[])) {
+          for (const building of this.buildingsToUserToAddToRendering) {
             let coords = project([building.coordinates.x, building.coordinates.y]);
             let markerSprite = new PIXI.Sprite(textures[0]);
             markerSprite.cacheAsBitmap = true
@@ -251,9 +264,11 @@ export class HomePage {
             markerSprite.y = coords.y;
             markerSprite.anchor.set(0.5, 0.5);
             markerSprite.scale.set(invScale)
+            markerSprite.id = building.buildingsToUserId
             this.container.addChild(markerSprite);
             this.markerSprites.push(markerSprite);
           }
+          this.buildingsToUserToAddToRendering = []
         }
         if (this.firstDraw || prevZoom !== zoom) {
           for (const markerSprite of this.markerSprites) {
@@ -300,10 +315,10 @@ export class HomePage {
 
   listenToZoom() {
     this.map.on('zoomstart', event => {
-      
+      // this.frame = requestAnimationFrame(this.animateMarker.bind(this));
     })
     this.map.on('zoomend', event => {
-      
+      // cancelAnimationFrame(this.frame)
     })
   }
 
@@ -325,9 +340,7 @@ export class HomePage {
     this.componentStateStore.changeComponentState(ComponentStateActions.CloseConstructionTab)
     this.buildingToCreate = building
 
-    // this.listenToMouseEvent()
-    this.listenToTouchEvent()
-
+    this.listenToMouseEvent()
   }
 
   listenToMouseEvent() {
@@ -345,24 +358,6 @@ export class HomePage {
         clearTimeout(this.mouseDownToAddBuildingTimeout)
       }
     })
-  }
-
-  listenToTouchEvent() {
-    this.map.on('mousedown touchstart', event => {
-      this.isMouseDownToAddBuilding = true
-      this.mouseDownToAddBuildingTimeout = setTimeout(() => {
-        this.buildingsService.addBuilding(event.latlng, this.buildingToCreate)
-        this.map.off('mousedown touchstart')
-        this.map.off('touchend')
-      }, 200);
-    })
-
-    this.map.on('touchend', event => {
-      if (this.isMouseDownToAddBuilding) {
-        clearTimeout(this.mouseDownToAddBuildingTimeout)
-      }
-    })
-
   }
 
   onMapAlmostReady(map: L.Map) {
