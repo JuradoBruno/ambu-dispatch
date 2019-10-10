@@ -32,7 +32,7 @@ export class HomePage {
   map
   miniMap
   osmStreetMap = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-  osmWiki = 'http://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png'
+  osmWiki = 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png'
   osmAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 
   movingMarkers = []
@@ -215,6 +215,9 @@ export class HomePage {
             markerSprite.anchor.set(0.5, 0.5);
             markerSprite.scale.set(this.desiredScale)
             markerSprite.id = building.buildingsToUserId
+            markerSprite.on('pointertap', event => {
+              console.log("TCL: HomePage -> instanciatePixiOverlay -> event", event.target.id)              
+            })
             this.container.addChild(markerSprite);
             this.markerSprites.push(markerSprite);
           }
