@@ -19,7 +19,7 @@ import { UserStore } from '../core/stores/user.store';
 import { BuildingsStore } from '../core/stores/buildings.store';
 import { Building } from '../models/Buildings.model';
 import { BuildingsService } from '../core/services/buildings.service';
-import { IBuildingToUser } from '../models/User.model';
+import { IBuildingToUser, User } from '../models/User.model';
 (<any>window).MSStream
 @Component({
   selector: 'app-home',
@@ -29,6 +29,7 @@ import { IBuildingToUser } from '../models/User.model';
 export class HomePage {
   subs = new SubSink()
 
+  user: User
   map
   miniMap
   osmStreetMap = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
@@ -124,7 +125,7 @@ export class HomePage {
   isMouseDownToAddBuilding = false
   allowBuildingPlacement = false
   mouseDownToAddBuildingTimeout: any
-  buildingToCreate: Building
+  buildingToCreateAndMoneyType: {building: Building, moneyType: string}
 
   constructor(
     private router: Router,
@@ -136,6 +137,7 @@ export class HomePage {
 
   ngOnInit() {
     this.listenToUserState()
+    this.listenToBuildingsState()
     this.listenToComponentsState()
     this.pixiLoader.add('hopital1', 'assets/icon/iso-hospital-min.png', new PIXI.Circle(0, 0, 20))
   }
@@ -145,7 +147,8 @@ export class HomePage {
       if (!state.user) {
         this.authService.getUser()
         return
-      } 
+      }
+      this.user = state.user
         
       this.coinMoney = state.user.coinMoney
       this.cashMoney = state.user.cashMoney
@@ -177,6 +180,7 @@ export class HomePage {
 
   listenToBuildingsState() {
     this.subs.sink = this.buildingStore.stateChanged.subscribe((state: IStoreState) => {
+      if (state.buildings.length === 0) this.buildingsService.getBuildings()
       this.buildings = state.buildings
     })
   }
@@ -218,7 +222,6 @@ export class HomePage {
             markerSprite.scale.set(this.desiredScale)
             markerSprite.id = building.buildingsToUserId
             markerSprite.on('pointertap', event => {
-              console.log("TCL: HomePage -> instanciatePixiOverlay -> event", event.target.id)            
             })
             this.container.addChild(markerSprite);
             this.markerSprites.push(markerSprite);
@@ -299,17 +302,27 @@ export class HomePage {
     this.componentStateStore.changeComponentState(ComponentStateActions.CloseConstructionTab)
   }
 
-  startBuildingPlacement(building) {
+  startBuildingPlacement(building: Building, moneyType: string) {
     this.componentStateStore.changeComponentState(ComponentStateActions.CloseConstructionTab)
-    this.buildingToCreate = building
+    this.buildingToCreateAndMoneyType = {building, moneyType}
     this.allowBuildingPlacement = true
   }
 
   // Used to create buildings
   onPress($event) {
     if (!this.allowBuildingPlacement) return
+    let moneyKeyBuilding = this.buildingToCreateAndMoneyType.moneyType + 'Price'
+    let moneyKeyUser = this.buildingToCreateAndMoneyType.moneyType + 'Money'
+    if (this.user[moneyKeyUser] < this.buildingToCreateAndMoneyType.building[moneyKeyBuilding]) {
+      // Show modal: Not enough money
+      this.allowBuildingPlacement = false
+      return
+    }
+    this.user[moneyKeyUser] -= this.buildingToCreateAndMoneyType.building[moneyKeyBuilding]
+    this.userStore.storeCurrentUser(this.user)
+    // Check if user has enough money
     let latlng = this.map.mouseEventToLatLng($event.srcEvent)
-    this.buildingsService.addBuilding(latlng, this.buildingToCreate)
+    this.buildingsService.addBuilding(latlng, this.buildingToCreateAndMoneyType)
     this.allowBuildingPlacement = false
   }
 
@@ -330,7 +343,6 @@ export class HomePage {
   onMapReady() {
     this.drawPIXIMarker()
     this.addMinimap()
-    this.listenToBuildingsState()
     this.listenToZoom()
     // this.addRouting()
   }

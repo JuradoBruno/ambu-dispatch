@@ -24,7 +24,7 @@ export class BuildingsStore extends ObservableStore<IStoreState>{
     }
 
     initialState: IBuildingsStore = {
-        buildings: [this.mockBuilding],
+        buildings: [],
         buildingsToUser: []
     }
 

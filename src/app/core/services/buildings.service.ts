@@ -28,9 +28,10 @@ export class BuildingsService{
     })
   }
 
-  addBuilding(latlng, building) {
+  addBuilding(latlng, buildingToCreateAndMoneyType) { 
+    const {building, moneyType} = buildingToCreateAndMoneyType
     let headers = this.baseHttpService.returnHeaders()
-    return this.http.post(this.buildingsUrl + '/by-coordinates', {latlng, building}, {headers}).toPromise().then((user: User) => {
+    return this.http.post(this.buildingsUrl + '/by-coordinates', {latlng, building, moneyType}, {headers}).toPromise().then((user: User) => {
       this.userStore.storeCurrentUser(user)
     })
   }
