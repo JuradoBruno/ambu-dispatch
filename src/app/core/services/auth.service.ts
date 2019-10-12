@@ -48,9 +48,9 @@ export class AuthService{
       this.baseHttpService.saveToken(response.accessToken)
       let user = new User(response.user)
       this.userStore.storeCurrentUser(user)
+      this.isAuthenticated = true
       return true
-    }).catch(error => {
-      
+    }).catch(error => {      
       if (error.status == 401) return false
       console.error(error)
     })
@@ -62,19 +62,8 @@ export class AuthService{
 
   signout() {
     localStorage.removeItem('accessToken')
+    this.isAuthenticated = false
   }
-
-
-  // POST with header EXAMPLE!
-  // @@@@@@@@@@@@
-  getUserTasks():Promise<boolean> {
-    let headers = this.baseHttpService.returnHeaders()
-    return this.http.post<any>(this.authUrl + '/test', {}, {headers}).toPromise().then(tasks => {
-      return tasks
-    }).catch(error => {
-    })
-  }
-  // @@@@@@@@@@@@
 
   private handleError(error: HttpErrorResponse) {
     console.error('server error:', error);

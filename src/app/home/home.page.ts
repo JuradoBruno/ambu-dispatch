@@ -132,7 +132,7 @@ export class HomePage {
   allowBuildingPlacement = false
   mouseDownToAddBuildingTimeout: any
   buildingToCreateAndMoneyType: {building: Building, moneyType: string}
-
+ 
   constructor(
     private router: Router,
     private modal: ModalService,

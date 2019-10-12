@@ -10,6 +10,7 @@ import { BaseHttpService } from './services/base-http.service';
 import { UserStore } from './stores/user.store';
 import { BuildingsStore } from './stores/buildings.store';
 import { BuildingsService } from './services/buildings.service';
+import { AuthGuard } from './services/auth-guard.service';
 
 @NgModule({
   declarations: [],
@@ -31,7 +32,8 @@ import { BuildingsService } from './services/buildings.service';
     BuildingsStore,
     BuildingsService,
     UserStore,
-    BaseHttpService
+    BaseHttpService,
+    AuthGuard
   ],
 })
 export class CoreModule extends EnsureModuleLoadedOnceGuard {
