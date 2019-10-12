@@ -101,7 +101,6 @@ export class HomePage {
   desiredScale = 0
   lastEvent = null
   utils = null
-  mapIsReady = false
   frame = null
   start = null
   progress = null
@@ -136,18 +135,21 @@ export class HomePage {
     private componentStateStore: ComponentsStateStore) { }
 
   ngOnInit() {
-    let user = JSON.parse(localStorage.getItem('user')) // TO REMOVE
-    if (user) this.userStore.storeCurrentUser(user) // TO REMOVE
+    this.listenToUserState()
     this.listenToComponentsState()
     this.pixiLoader.add('hopital1', 'assets/icon/iso-hospital-min.png', new PIXI.Circle(0, 0, 20))
-    this.mapIsReady = true
   }
 
   listenToUserState() {
     this.subs.sink = this.userStore.stateChanged.subscribe((state: IStoreState) => {
+      if (!state.user) {
+        this.authService.getUser()
+        return
+      } 
+        
       this.coinMoney = state.user.coinMoney
       this.cashMoney = state.user.cashMoney
-      if ((this.buildingsToUser.length < state.user.buildingsToUser.length) && this.mapIsReady) {
+      if ((this.buildingsToUser.length < state.user.buildingsToUser.length)) {
         this.firstDraw = true
         if (this.buildingsToUserToAddToRendering.length == 0) {
           this.buildingsToUserToAddToRendering = state.user.buildingsToUser
@@ -216,7 +218,7 @@ export class HomePage {
             markerSprite.scale.set(this.desiredScale)
             markerSprite.id = building.buildingsToUserId
             markerSprite.on('pointertap', event => {
-              console.log("TCL: HomePage -> instanciatePixiOverlay -> event", event.target.id)              
+              console.log("TCL: HomePage -> instanciatePixiOverlay -> event", event.target.id)            
             })
             this.container.addChild(markerSprite);
             this.markerSprites.push(markerSprite);
@@ -327,9 +329,7 @@ export class HomePage {
 
   onMapReady() {
     this.drawPIXIMarker()
-    // this.mapIsReady = true
     this.addMinimap()
-    this.listenToUserState()
     this.listenToBuildingsState()
     this.listenToZoom()
     // this.addRouting()

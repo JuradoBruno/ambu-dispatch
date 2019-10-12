@@ -1,15 +1,11 @@
 import { Injectable, Output, EventEmitter } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { map, take, catchError } from 'rxjs/operators';
 import { IUserSigninData, ISigninDto, IUserSignupData } from 'src/app/shared/interfaces';
 import { Observable } from 'rxjs';
-import { ObservableStore } from '@codewithdan/observable-store';
-import { IStoreState } from 'src/app/core/stores/store-state.interface';
 import { BaseHttpService } from './base-http.service';
 import { User } from 'src/app/models/User.model';
 import { UserStore } from '../stores/user.store';
 import { environment } from 'src/environments/environment';
-import { BuildingsStore } from '../stores/buildings.store';
 
 @Injectable({
   providedIn: 'root'
@@ -26,15 +22,19 @@ export class AuthService{
     private http: HttpClient,
     private baseHttpService: BaseHttpService,
     private userStore: UserStore,
-  ) {
-    console.log("TCL: AuthService -> baseUrl", this.baseUrl)
-
-  }
+  ) {}
 
   getUsername() {
     let username = localStorage.getItem('username')
     if (!username) return ''
     return username
+  }
+
+  getUser() {
+    let headers = this.baseHttpService.returnHeaders()
+    return this.http.get(this.authUrl + '/user', {headers}).toPromise().then((user: User) => {
+      this.userStore.storeCurrentUser(user)
+    })
   }
 
   saveUsername(username: string) {
@@ -43,13 +43,11 @@ export class AuthService{
   }
 
   signin(userData: IUserSigninData): Promise<boolean> {
-    console.log("TCL: AuthService -> this.authUrl", this.authUrl)
     return this.http.post<any>(this.authUrl + '/signin', userData).toPromise().then((response: ISigninDto) => {
       if (!response.accessToken) return false // Wrong data incoming
       this.baseHttpService.saveToken(response.accessToken)
       let user = new User(response.user)
       this.userStore.storeCurrentUser(user)
-      localStorage.setItem('user', JSON.stringify(user)) // TO REMOVE
       return true
     }).catch(error => {
       

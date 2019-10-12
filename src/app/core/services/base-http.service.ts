@@ -25,7 +25,7 @@ export class BaseHttpService extends ObservableStore<IStoreState> {
         localStorage.setItem('accessToken', accessToken);
     }
 
-    getTokenFromStorage() {
+    getTokenFromStorage() {        
         return localStorage.getItem('accessToken')
     }
 

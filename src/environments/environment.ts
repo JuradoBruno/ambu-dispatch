@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  // baseUrl: 'http://localhost:3000/',
-  baseUrl: 'https://ambu-recette-api.brunojurado.com/',
+  baseUrl: 'http://localhost:3000/',
+  // baseUrl: 'https://ambu-recette-api.brunojurado.com/',
   hmr: false
 };
 

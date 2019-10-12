@@ -19,7 +19,7 @@ export class UserStore extends ObservableStore<IStoreState>{
     testUser = new User(this.testUserData)
 
     initialState: IAuthStore = {
-        user: this.testUser
+        user: null
     }
 
     constructor() {
