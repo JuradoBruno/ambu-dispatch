@@ -103,6 +103,7 @@ export class HomePage {
   desiredScale = 0
   lastEvent = null
   utils = null
+  project = null
   frame = null
   start = null
   progress = null
@@ -111,14 +112,16 @@ export class HomePage {
   container: any;
   pixiOverlay: any;
   markerSprites: any[] = []
+  buildingsSprites: PIXI.Sprite[] | any[] = []
   pixiContainer: PIXI.Container = new PIXI.Container()
+  buildingsContainer: PIXI.Container = new PIXI.Container()  
   pixiLoader = new PIXI.Loader();
   
   hopitalTextureUri = 'assets/icon/hopital-texture.png'
-  hopitalTexture: PIXI.Texture = PIXI.Texture.from(this.hopitalTextureUri)
+  hopitalTexture: PIXI.Texture
   
   caserneAmbulanceTextureUri = 'assets/icon/caserne-ambulance.png'
-  caserneAmbulanceTexture: PIXI.Texture = PIXI.Texture.from(this.caserneAmbulanceTextureUri)
+  caserneAmbulanceTexture: PIXI.Texture
 
   coinMoney: any;
   cashMoney: any;
@@ -143,10 +146,13 @@ export class HomePage {
     private componentStateStore: ComponentsStateStore) { }
 
   ngOnInit() {
+    this.hopitalTexture = PIXI.Texture.from(this.hopitalTextureUri)
+    PIXI.Texture.addToCache(this.hopitalTexture, 'hopitalTexture')
+    this.caserneAmbulanceTexture = PIXI.Texture.from(this.caserneAmbulanceTextureUri)
+    PIXI.Texture.addToCache(this.caserneAmbulanceTexture, 'caserneAmbulanceTexture')
     this.listenToUserState()
     this.listenToBuildingsState()
     this.listenToComponentsState()
-    this.pixiLoader.add('hopital1', 'assets/icon/iso-hospital-min.png', new PIXI.Circle(0, 0, 20))
   }
 
   listenToUserState() {
@@ -159,6 +165,9 @@ export class HomePage {
         
       this.coinMoney = state.user.coinMoney
       this.cashMoney = state.user.cashMoney
+
+      if (state.user.buildingsToUser.length === 0) return
+
       if ((this.buildingsToUser.length < state.user.buildingsToUser.length)) {
         this.firstDraw = true
         if (this.buildingsToUserToAddToRendering.length == 0) {
@@ -168,15 +177,33 @@ export class HomePage {
           let newBuilding = _.maxBy(state.user.buildingsToUser, 'createdAt') // Getting only the last one
           this.buildingsToUserToAddToRendering = [newBuilding]
         }
-        // this.buildingsToUser = state.user.buildingsToUser
-        // this.drawPIXIMarker()
         if (this.pixiOverlay){
-          this.pixiOverlay.redraw(this.utils, this.lastEvent)
-        } 
-        // return
+          setTimeout(() => {
+            this.populateBuildingsContainer()
+            this.pixiOverlay.redraw()        
+          }, 0);
+        }
       }
       this.buildingsToUser = state.user.buildingsToUser
     })
+  }
+
+  populateBuildingsContainer() {
+    for (const building of this.buildingsToUserToAddToRendering) {
+      let coords = this.project([building.coordinates.x, building.coordinates.y]);
+      let buildingSprite = new PIXI.Sprite(this[building.building.textureName]);
+      buildingSprite.cacheAsBitmap = true
+      buildingSprite.interactive = true;
+      buildingSprite.buttonMode = true;
+      buildingSprite.x = coords.x;
+      buildingSprite.y = coords.y;      
+      buildingSprite.anchor.set(0.5, 0.5);
+      buildingSprite.scaleCoef = building.building.textureScale
+      buildingSprite.scale.set(this.desiredScale * buildingSprite.scaleCoef)
+      buildingSprite.id = building.buildingsToUserId
+      this.buildingsContainer.addChild(buildingSprite);
+      this.buildingsSprites.push(buildingSprite);      
+    }
   }
 
   listenToComponentsState() {
@@ -192,8 +219,7 @@ export class HomePage {
     })
   }
 
-  instanciatePixiOverlay() {
-    
+  instanciatePixiOverlay() {    
     this.pixiOverlay = L.pixiOverlay((utils, event) => {
         this.lastEvent = event
         this.utils = utils
@@ -206,7 +232,7 @@ export class HomePage {
         this.container = utils.getContainer();
         // this.container.cacheAsBitmap = true
         this.renderer = utils.getRenderer();
-        let project = utils.latLngToLayerPoint;
+        this.project = utils.latLngToLayerPoint;
         let scale = utils.getScale();
         if (zoom >= 17) this.desiredScale = 0.003;
         if (zoom == 16) this.desiredScale = 0.005;
@@ -215,35 +241,16 @@ export class HomePage {
         if (zoom == 13) this.desiredScale = 0.013;
         if ( zoom < 13) this.desiredScale = 0.015;
         
-        if (this.firstDraw) {
-          this.prevZoom = zoom;
-          for (const building of this.buildingsToUserToAddToRendering) {
-            let coords = project([building.coordinates.x, building.coordinates.y]);
-
-            let markerSprite = new PIXI.Sprite(this[building.building.textureName]);
-            markerSprite.cacheAsBitmap = true
-            markerSprite.interactive = true;
-            markerSprite.buttonMode = true;
-            markerSprite.x = coords.x;
-            markerSprite.y = coords.y;
-            markerSprite.anchor.set(0.5, 0.5);
-            markerSprite.scaleCoef = building.building.textureScale
-            markerSprite.scale.set(this.desiredScale * markerSprite.scaleCoef)
-            markerSprite.id = building.buildingsToUserId
-            markerSprite.on('pointertap', event => {
-            console.log("TCL: HomePage -> instanciatePixiOverlay -> event", event)
-            })
-            this.container.addChild(markerSprite);
-            this.markerSprites.push(markerSprite);
-          }
-        }
+        // if (this.firstDraw) {
+        //   this.prevZoom = zoom;
+        // }
         if (this.firstDraw || this.prevZoom !== zoom) {
-          for (const markerSprite of this.markerSprites) {
+          for (const buildingSprite of this.buildingsSprites) {
             if (this.firstDraw) {
-              markerSprite.scale.set(this.desiredScale * markerSprite.scaleCoef);
+              buildingSprite.scale.set(this.desiredScale * buildingSprite.scaleCoef);
             } else {
-              markerSprite.currentScale = markerSprite.scale.x;
-              markerSprite.targetScale = this.desiredScale * markerSprite.scaleCoef;
+              buildingSprite.currentScale = buildingSprite.scale.x;
+              buildingSprite.targetScale = this.desiredScale * buildingSprite.scaleCoef;
             }
           }
         }
@@ -259,20 +266,18 @@ export class HomePage {
       }, this.pixiContainer, {
         doubleBuffering: false
       })
+      this.pixiContainer.addChild(this.buildingsContainer)
+      this.pixiOverlay.addTo(this.map)      
+  }
 
-      this.pixiOverlay.addTo(this.map)
+  onSpriteClicked(event) {
   }
 
   drawPIXIMarker() {
     // var easing = BezierEasing(0, 0, 0.25, 1);
 
     this.pixiLoader.load((loader, resources) => {
-
-      let prevZoom;
-
       this.frame = null;
-      let focus = null;
-      let doubleBuffering = /iPad|iPhone|iPod/.test(navigator.userAgent);
       this.instanciatePixiOverlay()
       // let doubleBuffering = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     })
@@ -285,10 +290,10 @@ export class HomePage {
     let lambda = this.progress / delta;
     if (lambda > 1) lambda = 1;
     lambda = lambda * (0.4 + lambda * (2.2 + lambda * -1.6));
-    for (const markerSprite of this.markerSprites) {
+    for (const markerSprite of this.buildingsSprites) {
       markerSprite.scale.set(markerSprite.currentScale + lambda * (markerSprite.targetScale - markerSprite.currentScale));
     }
-    this.renderer.render(this.container);
+    this.renderer.render(this.pixiContainer);
     if (this.progress < delta) {
       this.frame = requestAnimationFrame(this.animateMarker.bind(this));
     }
