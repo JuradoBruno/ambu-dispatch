@@ -63,7 +63,7 @@
                 <div class="building-container" *ngFor="let building of buildings">
                   <!-- Icon & Name -->
                   <div class="left-part">
-                    <img src="assets/icon/hopital-rond-strong.png" alt="" class="building-icon">
+                    <img src="assets/icon/{{building.textureFileName}}.png" alt="" class="building-icon">
                     <span class="building-name">{{building.buildingCore.title}}</span>
                   </div>
                   

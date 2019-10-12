@@ -4,6 +4,9 @@ export class Building{
         description: string
     }
     id: number    
+    textureFileName: string
+    textureName: string
+    textureScale: number
     specificDescription: string
     level: number
     coinPrice: number

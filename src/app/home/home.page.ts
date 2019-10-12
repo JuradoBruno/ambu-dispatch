@@ -20,6 +20,7 @@ import { BuildingsStore } from '../core/stores/buildings.store';
 import { Building } from '../models/Buildings.model';
 import { BuildingsService } from '../core/services/buildings.service';
 import { IBuildingToUser, User } from '../models/User.model';
+import { ModalService } from '../core/modal/modal.service';
 (<any>window).MSStream
 @Component({
   selector: 'app-home',
@@ -112,7 +113,12 @@ export class HomePage {
   markerSprites: any[] = []
   pixiContainer: PIXI.Container = new PIXI.Container()
   pixiLoader = new PIXI.Loader();
-  hopitalTexture: PIXI.Texture = PIXI.Texture.from('assets/icon/iso-hospital-min.png')
+  
+  hopitalTextureUri = 'assets/icon/hopital-texture.png'
+  hopitalTexture: PIXI.Texture = PIXI.Texture.from(this.hopitalTextureUri)
+  
+  caserneAmbulanceTextureUri = 'assets/icon/caserne-ambulance.png'
+  caserneAmbulanceTexture: PIXI.Texture = PIXI.Texture.from(this.caserneAmbulanceTextureUri)
 
   coinMoney: any;
   cashMoney: any;
@@ -129,6 +135,7 @@ export class HomePage {
 
   constructor(
     private router: Router,
+    private modal: ModalService,
     private authService: AuthService,
     private userStore: UserStore,
     private buildingsService: BuildingsService,
@@ -212,29 +219,31 @@ export class HomePage {
           this.prevZoom = zoom;
           for (const building of this.buildingsToUserToAddToRendering) {
             let coords = project([building.coordinates.x, building.coordinates.y]);
-            let markerSprite = new PIXI.Sprite(this.hopitalTexture);
+
+            let markerSprite = new PIXI.Sprite(this[building.building.textureName]);
             markerSprite.cacheAsBitmap = true
             markerSprite.interactive = true;
             markerSprite.buttonMode = true;
             markerSprite.x = coords.x;
             markerSprite.y = coords.y;
             markerSprite.anchor.set(0.5, 0.5);
-            markerSprite.scale.set(this.desiredScale)
+            markerSprite.scaleCoef = building.building.textureScale
+            markerSprite.scale.set(this.desiredScale * markerSprite.scaleCoef)
             markerSprite.id = building.buildingsToUserId
             markerSprite.on('pointertap', event => {
+            console.log("TCL: HomePage -> instanciatePixiOverlay -> event", event)
             })
             this.container.addChild(markerSprite);
             this.markerSprites.push(markerSprite);
           }
-          this.buildingsToUserToAddToRendering = []
         }
         if (this.firstDraw || this.prevZoom !== zoom) {
           for (const markerSprite of this.markerSprites) {
             if (this.firstDraw) {
-              markerSprite.scale.set(this.desiredScale);
+              markerSprite.scale.set(this.desiredScale * markerSprite.scaleCoef);
             } else {
               markerSprite.currentScale = markerSprite.scale.x;
-              markerSprite.targetScale = this.desiredScale;
+              markerSprite.targetScale = this.desiredScale * markerSprite.scaleCoef;
             }
           }
         }
@@ -303,7 +312,22 @@ export class HomePage {
   }
 
   startBuildingPlacement(building: Building, moneyType: string) {
+    let moneyKeyBuilding = moneyType + 'Price'
+    let moneyKeyUser = moneyType + 'Money'
+    if (this.user[moneyKeyUser] < building[moneyKeyBuilding]) {
+      this.modal.show({
+        header: 'Dommage!',
+        body: "Vous n'avez pas assez d'argent pour construire ce bâtiment",
+        cancelButtonVisible: false
+      })
+      return
+    }
     this.componentStateStore.changeComponentState(ComponentStateActions.CloseConstructionTab)
+    this.modal.show({
+      header: 'Important',
+      body: "Vous vous apprétez à construire un bâtiment. Appuyez longuement sur l'emplacement que vous avez choisi",
+      cancelButtonVisible: false
+    })
     this.buildingToCreateAndMoneyType = {building, moneyType}
     this.allowBuildingPlacement = true
   }
@@ -312,17 +336,12 @@ export class HomePage {
   onPress($event) {
     if (!this.allowBuildingPlacement) return
     let moneyKeyBuilding = this.buildingToCreateAndMoneyType.moneyType + 'Price'
-    let moneyKeyUser = this.buildingToCreateAndMoneyType.moneyType + 'Money'
-    if (this.user[moneyKeyUser] < this.buildingToCreateAndMoneyType.building[moneyKeyBuilding]) {
-      // Show modal: Not enough money
-      this.allowBuildingPlacement = false
-      return
-    }
+    let moneyKeyUser = this.buildingToCreateAndMoneyType.moneyType + 'Money'    
     this.user[moneyKeyUser] -= this.buildingToCreateAndMoneyType.building[moneyKeyBuilding]
     this.userStore.storeCurrentUser(this.user)
     // Check if user has enough money
     let latlng = this.map.mouseEventToLatLng($event.srcEvent)
-    this.buildingsService.addBuilding(latlng, this.buildingToCreateAndMoneyType)
+      this.buildingsService.addBuilding(latlng, this.buildingToCreateAndMoneyType)
     this.allowBuildingPlacement = false
   }
 
