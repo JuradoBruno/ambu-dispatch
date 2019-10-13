@@ -150,7 +150,6 @@ export class HomePage {
     PIXI.Texture.addToCache(this.hopitalTexture, 'hopitalTexture')
     this.caserneAmbulanceTexture = PIXI.Texture.from(this.caserneAmbulanceTextureUri)
     PIXI.Texture.addToCache(this.caserneAmbulanceTexture, 'caserneAmbulanceTexture')
-    this.listenToUserState()
     this.listenToBuildingsState()
     this.listenToComponentsState()
   }
@@ -177,21 +176,18 @@ export class HomePage {
           let newBuilding = _.maxBy(state.user.buildingsToUser, 'createdAt') // Getting only the last one
           this.buildingsToUserToAddToRendering = [newBuilding]
         }
-        if (this.pixiOverlay){
-          setTimeout(() => {
-            this.populateBuildingsContainer()
-            this.pixiOverlay.redraw()        
-          }, 0);
-        }
+        this.populateBuildingsContainer()
+        this.buildingsToUser = state.user.buildingsToUser
+        setTimeout(() => {
+          this.pixiOverlay.redraw()        
+        }, 500);
       }
-      this.buildingsToUser = state.user.buildingsToUser
     })
   }
-
   populateBuildingsContainer() {
     for (const building of this.buildingsToUserToAddToRendering) {
       let coords = this.project([building.coordinates.x, building.coordinates.y]);
-      let buildingSprite = new PIXI.Sprite(this[building.building.textureName]);
+      let buildingSprite = new BuildingSprite(this[building.building.textureName]);
       buildingSprite.cacheAsBitmap = true
       buildingSprite.interactive = true;
       buildingSprite.buttonMode = true;
@@ -201,8 +197,12 @@ export class HomePage {
       buildingSprite.scaleCoef = building.building.textureScale
       buildingSprite.scale.set(this.desiredScale * buildingSprite.scaleCoef)
       buildingSprite.id = building.buildingsToUserId
+      buildingSprite.building = building
+      buildingSprite.on('pointertap', event => {
+        console.log("TCL: HomePage -> populateBuildingsContainer -> event", event.target.building)
+      })
       this.buildingsContainer.addChild(buildingSprite);
-      this.buildingsSprites.push(buildingSprite);      
+      this.buildingsSprites.push(buildingSprite);
     }
   }
 
@@ -241,9 +241,9 @@ export class HomePage {
         if (zoom == 13) this.desiredScale = 0.013;
         if ( zoom < 13) this.desiredScale = 0.015;
         
-        // if (this.firstDraw) {
-        //   this.prevZoom = zoom;
-        // }
+        if (this.firstDraw) {
+          this.prevZoom = zoom;
+        }
         if (this.firstDraw || this.prevZoom !== zoom) {
           for (const buildingSprite of this.buildingsSprites) {
             if (this.firstDraw) {
@@ -266,8 +266,9 @@ export class HomePage {
       }, this.pixiContainer, {
         doubleBuffering: false
       })
+      this.pixiOverlay.addTo(this.map)
+      this.listenToUserState()
       this.pixiContainer.addChild(this.buildingsContainer)
-      this.pixiOverlay.addTo(this.map)      
   }
 
   onSpriteClicked(event) {
@@ -359,7 +360,6 @@ export class HomePage {
     setTimeout(() => {
       this.map.invalidateSize()
       this.map.removeControl(this.map.zoomControl)
-      new L.Control.Zoom({ position: 'bottomleft' }).addTo(this.map)
       this.onMapReady()
     }, 0)
   }
@@ -456,4 +456,9 @@ export class HomePage {
     this.router.navigate(['/auth'])
     this.authService.signout()
   }
+}
+
+export class BuildingSprite extends PIXI.Sprite {
+  id: number
+  building: IBuildingToUser
 }

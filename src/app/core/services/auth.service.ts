@@ -15,7 +15,6 @@ export class AuthService{
   baseUrl = environment.baseUrl // Get that from .env
   // baseUrl = 'https://ambu-dispatch-production.eu-west-1.elasticbeanstalk.com/' // Get that from .env
   authUrl = this.baseUrl + 'auth'
-  isAuthenticated = false;
   @Output() authChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
   
   constructor(
@@ -48,7 +47,6 @@ export class AuthService{
       this.baseHttpService.saveToken(response.accessToken)
       let user = new User(response.user)
       this.userStore.storeCurrentUser(user)
-      this.isAuthenticated = true
       return true
     }).catch(error => {      
       if (error.status == 401) return false
@@ -62,7 +60,6 @@ export class AuthService{
 
   signout() {
     localStorage.removeItem('accessToken')
-    this.isAuthenticated = false
   }
 
   private handleError(error: HttpErrorResponse) {
