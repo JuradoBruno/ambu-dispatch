@@ -1,5 +1,6 @@
-import { Building } from '../../models/Buildings.model';
+import { Building } from '../../models/Building.model';
 import { IBuildingToUser } from '../../models/User.model';
+import { Mission } from '../../models/Mission.model';
 
 export interface IStoreState {
     accessToken: string
@@ -9,4 +10,5 @@ export interface IStoreState {
     user: any
     buildingsToUser: IBuildingToUser[];
     buildings: Building[]
+    missions: Mission[]
 }

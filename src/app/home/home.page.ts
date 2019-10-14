@@ -17,10 +17,13 @@ import { IStoreState } from '../core/stores/store-state.interface';
 import { ComponentsStateStore, ComponentStateActions } from '../core/stores/components-state.store';
 import { UserStore } from '../core/stores/user.store';
 import { BuildingsStore } from '../core/stores/buildings.store';
-import { Building } from '../models/Buildings.model';
+import { Building } from '../models/Building.model';
 import { BuildingsService } from '../core/services/buildings.service';
 import { IBuildingToUser, User } from '../models/User.model';
 import { ModalService } from '../core/modal/modal.service';
+import { Mission } from '../models/Mission.model';
+import { MissionsStore } from '../core/stores/missions.store';
+import { MissionsService } from '../core/services/missions.service';
 (<any>window).MSStream
 @Component({
   selector: 'app-home',
@@ -129,6 +132,8 @@ export class HomePage {
   buildings: Building[]
   buildingsToUser: IBuildingToUser[] = []
   buildingsToUserToAddToRendering: IBuildingToUser[] = []
+  
+  missions: Mission[]
 
   firstDraw = true
   isMouseDownToAddBuilding = false
@@ -142,7 +147,9 @@ export class HomePage {
     private authService: AuthService,
     private userStore: UserStore,
     private buildingsService: BuildingsService,
-    private buildingStore: BuildingsStore,
+    private buildingsStore: BuildingsStore,
+    private missionsService: MissionsService,
+    private missionsStore: MissionsStore,
     private componentStateStore: ComponentsStateStore) { }
 
   ngOnInit() {
@@ -192,7 +199,7 @@ export class HomePage {
       buildingSprite.interactive = true;
       buildingSprite.buttonMode = true;
       buildingSprite.x = coords.x;
-      buildingSprite.y = coords.y;      
+      buildingSprite.y = coords.y;
       buildingSprite.anchor.set(0.5, 0.5);
       buildingSprite.scaleCoef = building.building.textureScale
       buildingSprite.scale.set(this.desiredScale * buildingSprite.scaleCoef)
@@ -213,9 +220,16 @@ export class HomePage {
   }
 
   listenToBuildingsState() {
-    this.subs.sink = this.buildingStore.stateChanged.subscribe((state: IStoreState) => {
+    this.subs.sink = this.buildingsStore.stateChanged.subscribe((state: IStoreState) => {
       if (state.buildings.length === 0) this.buildingsService.getBuildings()
       this.buildings = state.buildings
+    })
+  }
+
+  listenToMissionsState() {
+    this.subs.sink = this.missionsStore.stateChanged.subscribe((state: IStoreState) => {
+      if (state.missions.length === 0) this.missionsService.getMissions()
+      this.missions = state.missions
     })
   }
 

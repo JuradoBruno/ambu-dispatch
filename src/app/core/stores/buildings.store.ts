@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ObservableStore } from '@codewithdan/observable-store';
 import { IStoreState } from 'src/app/core/stores/store-state.interface';
-import { Building } from 'src/app/models/Buildings.model';
+import { Building } from 'src/app/models/Building.model';
 import { IBuildingToUser } from '../../models/User.model';
 
 @Injectable()

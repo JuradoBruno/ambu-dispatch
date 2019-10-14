@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Building } from 'src/app/models/Buildings.model';
+import { Building } from 'src/app/models/Building.model';
 import { BuildingsStore } from '../stores/buildings.store';
 import { environment } from 'src/environments/environment';
 import { BaseHttpService } from './base-http.service';

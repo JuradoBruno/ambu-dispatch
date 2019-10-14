@@ -1,4 +1,4 @@
-import { Building } from './Buildings.model'
+import { Building } from './Building.model'
 
 export class User {
     id: number

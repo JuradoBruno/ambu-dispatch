@@ -7,6 +7,7 @@ import { IStoreState } from '../core/stores/store-state.interface';
 import { AuthService } from '../core/services/auth.service';
 import { Router } from '@angular/router';
 import { BuildingsService } from '../core/services/buildings.service';
+import { MissionsService } from '../core/services/missions.service';
 
 @Component({
   selector: 'app-auth',
@@ -25,7 +26,8 @@ export class AuthComponent implements OnInit, OnDestroy {
   constructor(
     private ComponentsStateStore: ComponentsStateStore,
     private authService: AuthService,
-    private buildingService: BuildingsService,
+    private buildingsService: BuildingsService,
+    private missionsService: MissionsService,
     private router: Router
     ) { }
 
@@ -47,11 +49,8 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   async fetchImportantData() {
-    this.buildingService.getBuildings()
-  }
-
-  getUserTasks() {
-    this.authService.getUserTasks()
+    this.buildingsService.getBuildings()
+    this.missionsService.getMissions()
   }
 
   play() {
