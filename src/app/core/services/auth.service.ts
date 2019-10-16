@@ -55,7 +55,13 @@ export class AuthService{
   }
 
   signup(userData: IUserSignupData): Promise<boolean> {
-    return this.http.post<any>(this.authUrl + '/signup', userData).toPromise()
+    return this.http.post<any>(this.authUrl + '/signup', userData).toPromise().then(response => {
+      if (!response.accessToken) return false // Wrong data incoming
+      this.baseHttpService.saveToken(response.accessToken)
+      let user = new User(response.user)
+      this.userStore.storeCurrentUser(user)
+      return true
+    })
   }
 
   signout() {

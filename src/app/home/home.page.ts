@@ -19,7 +19,7 @@ import { UserStore } from '../core/stores/user.store';
 import { BuildingsStore } from '../core/stores/buildings.store';
 import { Building } from '../models/Building.model';
 import { BuildingsService } from '../core/services/buildings.service';
-import { IBuildingToUser, User } from '../models/User.model';
+import { IBuildingToUser, User, IMissionToUser } from '../models/User.model';
 import { ModalService } from '../core/modal/modal.service';
 import { Mission } from '../models/Mission.model';
 import { MissionsStore } from '../core/stores/missions.store';
@@ -114,10 +114,15 @@ export class HomePage {
   renderer: any;
   container: any;
   pixiOverlay: any;
+  allSprites: PIXI.Sprite[] | any[] = []
   markerSprites: any[] = []
   buildingsSprites: PIXI.Sprite[] | any[] = []
   pixiContainer: PIXI.Container = new PIXI.Container()
-  buildingsContainer: PIXI.Container = new PIXI.Container()  
+  buildingsContainer: PIXI.Container = new PIXI.Container() 
+  missionsSprites: PIXI.Sprite[] | any[] = [] 
+  missionsContainer: PIXI.Container = new PIXI.Container()  
+  vehiclesContainer: PIXI.Container = new PIXI.Container()  
+
   pixiLoader = new PIXI.Loader();
   
   hopitalTextureUri = 'assets/icon/hopital-texture.png'
@@ -125,15 +130,20 @@ export class HomePage {
   
   caserneAmbulanceTextureUri = 'assets/icon/caserne-ambulance.png'
   caserneAmbulanceTexture: PIXI.Texture
+  
+  missionTextureUri = 'assets/icon/excla-1.png'
+  missionTexture: PIXI.Texture
 
   coinMoney: any;
   cashMoney: any;
   showConstructionTab: boolean;
   buildings: Building[]
   buildingsToUser: IBuildingToUser[] = []
-  buildingsToUserToAddToRendering: IBuildingToUser[] = []
+  buildingsToUserToAddToRendering: IBuildingToUser[] = []  
   
-  missions: Mission[]
+  missions: Mission[] = []
+  missionsToUser: IMissionToUser[] = []
+  missionsToUserToAddToRendering: IMissionToUser[] = []
 
   firstDraw = true
   isMouseDownToAddBuilding = false
@@ -157,7 +167,10 @@ export class HomePage {
     PIXI.Texture.addToCache(this.hopitalTexture, 'hopitalTexture')
     this.caserneAmbulanceTexture = PIXI.Texture.from(this.caserneAmbulanceTextureUri)
     PIXI.Texture.addToCache(this.caserneAmbulanceTexture, 'caserneAmbulanceTexture')
+    this.missionTexture = PIXI.Texture.from(this.missionTextureUri)
+    PIXI.Texture.addToCache(this.missionTexture, 'missionTexture')
     this.listenToBuildingsState()
+    this.listenToMissionsState()
     this.listenToComponentsState()
   }
 
@@ -172,25 +185,52 @@ export class HomePage {
       this.coinMoney = state.user.coinMoney
       this.cashMoney = state.user.cashMoney
 
-      if (state.user.buildingsToUser.length === 0) return
-
-      if ((this.buildingsToUser.length < state.user.buildingsToUser.length)) {
-        this.firstDraw = true
-        if (this.buildingsToUserToAddToRendering.length == 0) {
-          this.buildingsToUserToAddToRendering = state.user.buildingsToUser
-        }
-        else {
-          let newBuilding = _.maxBy(state.user.buildingsToUser, 'createdAt') // Getting only the last one
-          this.buildingsToUserToAddToRendering = [newBuilding]
-        }
-        this.populateBuildingsContainer()
-        this.buildingsToUser = state.user.buildingsToUser
-        setTimeout(() => {
-          this.pixiOverlay.redraw()        
-        }, 500);
-      }
+      this.manageBuildingsToUser(state)
+      this.manageMissionsToUser(state)
+      this.container
+      
     })
   }
+  manageMissionsToUser(state) {
+    if (state.user.missionsToUser.length === 0) return
+
+    if ((this.missionsToUser.length < state.user.missionsToUser.length)) {
+      this.firstDraw = true
+      if (this.missionsToUserToAddToRendering.length == 0) {
+        this.missionsToUserToAddToRendering = state.user.missionsToUser
+      }
+      else {
+        let newMission = _.maxBy(state.user.missionsToUser, 'createdAt') // Getting only the last one
+        this.missionsToUserToAddToRendering = [newMission]
+      }
+      this.populateMissionsContainer()
+      this.missionsToUser = state.user.missionsToUser
+      setTimeout(() => {
+        this.pixiOverlay.redraw()        
+      }, 500);
+    }
+  }
+
+  manageBuildingsToUser(state) {
+    if (state.user.buildingsToUser.length === 0) return
+
+    if ((this.buildingsToUser.length < state.user.buildingsToUser.length)) {
+      this.firstDraw = true
+      if (this.buildingsToUserToAddToRendering.length == 0) {
+        this.buildingsToUserToAddToRendering = state.user.buildingsToUser
+      }
+      else {
+        let newBuilding = _.maxBy(state.user.buildingsToUser, 'createdAt') // Getting only the last one
+        this.buildingsToUserToAddToRendering = [newBuilding]
+      }
+      this.populateBuildingsContainer()
+      this.buildingsToUser = state.user.buildingsToUser
+      setTimeout(() => {
+        this.pixiOverlay.redraw()        
+      }, 500);
+    }
+  }
+
   populateBuildingsContainer() {
     for (const building of this.buildingsToUserToAddToRendering) {
       let coords = this.project([building.coordinates.x, building.coordinates.y]);
@@ -206,10 +246,33 @@ export class HomePage {
       buildingSprite.id = building.buildingsToUserId
       buildingSprite.building = building
       buildingSprite.on('pointertap', event => {
-        console.log("TCL: HomePage -> populateBuildingsContainer -> event", event.target.building)
       })
       this.buildingsContainer.addChild(buildingSprite);
       this.buildingsSprites.push(buildingSprite);
+      this.allSprites.push(buildingSprite);
+    }
+  }
+
+  populateMissionsContainer() {
+    for (const mission of this.missionsToUserToAddToRendering) {
+      let coords = this.project([mission.coordinates.x, mission.coordinates.y]);
+      let missionSprite = new MissionSprite(this[mission.mission.textureName]);
+      missionSprite.cacheAsBitmap = true
+      missionSprite.interactive = true;
+      missionSprite.buttonMode = true;
+      missionSprite.x = coords.x;
+      missionSprite.y = coords.y;
+      missionSprite.anchor.set(0.5, 0.5);
+      missionSprite.scaleCoef = mission.mission.textureScale
+      missionSprite.scale.set(this.desiredScale * missionSprite.scaleCoef)
+      missionSprite.id = mission.id
+      missionSprite.mission = mission
+      missionSprite.on('pointertap', event => {
+        console.log("HomePage -> populateMissionsContainer -> event", event.target.mission)
+      })
+      this.missionsContainer.addChild(missionSprite);
+      this.missionsSprites.push(missionSprite); 
+      this.allSprites.push(missionSprite); 
     }
   }
 
@@ -247,7 +310,6 @@ export class HomePage {
         // this.container.cacheAsBitmap = true
         this.renderer = utils.getRenderer();
         this.project = utils.latLngToLayerPoint;
-        let scale = utils.getScale();
         if (zoom >= 17) this.desiredScale = 0.003;
         if (zoom == 16) this.desiredScale = 0.005;
         if (zoom == 15) this.desiredScale = 0.008;
@@ -259,12 +321,12 @@ export class HomePage {
           this.prevZoom = zoom;
         }
         if (this.firstDraw || this.prevZoom !== zoom) {
-          for (const buildingSprite of this.buildingsSprites) {
+          for (const sprite of this.allSprites) {
             if (this.firstDraw) {
-              buildingSprite.scale.set(this.desiredScale * buildingSprite.scaleCoef);
+              sprite.scale.set(this.desiredScale * sprite.scaleCoef);
             } else {
-              buildingSprite.currentScale = buildingSprite.scale.x;
-              buildingSprite.targetScale = this.desiredScale * buildingSprite.scaleCoef;
+              sprite.currentScale = sprite.scale.x;
+              sprite.targetScale = this.desiredScale * sprite.scaleCoef;
             }
           }
         }
@@ -283,6 +345,7 @@ export class HomePage {
       this.pixiOverlay.addTo(this.map)
       this.listenToUserState()
       this.pixiContainer.addChild(this.buildingsContainer)
+      this.pixiContainer.addChild(this.missionsContainer)
   }
 
   onSpriteClicked(event) {
@@ -305,7 +368,7 @@ export class HomePage {
     let lambda = this.progress / delta;
     if (lambda > 1) lambda = 1;
     lambda = lambda * (0.4 + lambda * (2.2 + lambda * -1.6));
-    for (const markerSprite of this.buildingsSprites) {
+    for (const markerSprite of this.allSprites) {
       markerSprite.scale.set(markerSprite.currentScale + lambda * (markerSprite.targetScale - markerSprite.currentScale));
     }
     this.renderer.render(this.pixiContainer);
@@ -356,12 +419,11 @@ export class HomePage {
   onPress($event) {
     if (!this.allowBuildingPlacement) return
     let moneyKeyBuilding = this.buildingToCreateAndMoneyType.moneyType + 'Price'
-    let moneyKeyUser = this.buildingToCreateAndMoneyType.moneyType + 'Money'    
-    this.user[moneyKeyUser] -= this.buildingToCreateAndMoneyType.building[moneyKeyBuilding]
+    let moneyKeyUser = this.buildingToCreateAndMoneyType.moneyType + 'Money'
     this.userStore.storeCurrentUser(this.user)
     // Check if user has enough money
     let latlng = this.map.mouseEventToLatLng($event.srcEvent)
-      this.buildingsService.addBuilding(latlng, this.buildingToCreateAndMoneyType)
+    this.buildingsService.addBuilding(latlng, this.buildingToCreateAndMoneyType)
     this.allowBuildingPlacement = false
   }
 
@@ -383,6 +445,14 @@ export class HomePage {
     this.addMinimap()
     this.listenToZoom()
     // this.addRouting()
+  }
+
+  spawnMission() {
+    // Associate a mission with the current user
+    let mission = this.missions[0]
+    // let latlng = {lat: 43.6098241940165, lng: 1.39453411102295}
+    let latlng = {lat: 43.60684887974696, lng: 1.3940298557281494}
+    this.missionsService.addMission(latlng, mission)
   }
 
   continueMission() {
@@ -475,4 +545,9 @@ export class HomePage {
 export class BuildingSprite extends PIXI.Sprite {
   id: number
   building: IBuildingToUser
+}
+
+export class MissionSprite extends PIXI.Sprite {
+  id: number
+  mission: IMissionToUser
 }

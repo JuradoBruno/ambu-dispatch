@@ -255,7 +255,7 @@
     }
 }
 
-.leave-button {
+.square-button {
     z-index: 1;
     height: 30px;
     width: 30px;
@@ -263,7 +263,11 @@
     top: 10px;
     left: 10px;
     font-size: 15px;
-    font-weight: 700;
+    font-weight: 700;  
+    
+    &.mission {
+        top: 50px;
+    }
 }
 
 .control-button {

@@ -1,4 +1,5 @@
 import { Building } from './Building.model'
+import { Mission } from './Mission.model'
 
 export class User {
     id: number
@@ -9,6 +10,7 @@ export class User {
     coinMoney: number
     cashMoney: number
     buildingsToUser: IBuildingToUser[]
+    missionsToUser: IMissionToUser[]
     
     constructor(user?: any) {
         Object.assign(this, user)
@@ -26,4 +28,18 @@ export interface IBuildingToUser {
     },
     address: string,
     building: Building
+}
+
+export interface IMissionToUser {
+    id: number,
+    missionId: number,
+    userId: number,
+    state: any,
+    createdAt: string,
+    coordinates: {
+        x: number,
+        y: number
+    },
+    address: string,
+    mission: Mission
 }

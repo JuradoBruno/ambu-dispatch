@@ -13,7 +13,8 @@ export class UserStore extends ObservableStore<IStoreState>{
         salt: '$2a$10$7TDmMzY1cxt7en/AZIlNMO',
         coinMoney: 159999,
         cashMoney: 150,
-        buildingsToUser: []
+        buildingsToUser: [],
+        missionsToUser: []
     }
 
     testUser = new User(this.testUserData)

@@ -90,6 +90,7 @@ export class SignupComponent implements OnInit {
       this.closeSelf()
       this.router.navigate(['/home'])
     }).catch(error => {
+      console.error(error)
       this.showFormError(error.error.message)
     })
   }
