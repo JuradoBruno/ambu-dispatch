@@ -1,5 +1,5 @@
 import { Building } from '../../models/Building.model';
-import { BuildingToUser } from '../../models/User.model';
+import { BuildingToUser } from '../../models/Building.model';
 import { Mission } from '../../models/Mission.model';
 
 export interface IStoreState {

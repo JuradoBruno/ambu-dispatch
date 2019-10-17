@@ -1,5 +1,5 @@
-import { Building } from './Building.model'
-import { Mission } from './Mission.model'
+import { BuildingToUser } from './Building.model'
+import { MissionToUser } from './Mission.model'
 
 export class User {
     id: number
@@ -15,31 +15,4 @@ export class User {
     constructor(user?: any) {
         Object.assign(this, user)
     }
-}
-
-export interface BuildingToUser {
-    buildingsToUserId: number,
-    buildingId: number,
-    userId: number,
-    createdAt: string,
-    coordinates: {
-        x: number,
-        y: number
-    },
-    address: string,
-    building: Building
-}
-
-export interface MissionToUser {
-    id: number,
-    missionId: number,
-    userId: number,
-    state: any,
-    createdAt: string,
-    coordinates: {
-        x: number,
-        y: number
-    },
-    address: string,
-    mission: Mission
 }

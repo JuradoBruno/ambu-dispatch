@@ -17,14 +17,16 @@ import { IStoreState } from '../core/stores/store-state.interface';
 import { ComponentsStateStore, ComponentStateActions } from '../core/stores/components-state.store';
 import { UserStore } from '../core/stores/user.store';
 import { BuildingsStore } from '../core/stores/buildings.store';
-import { Building } from '../models/Building.model';
+import { Building, BuildingToUser } from '../models/Building.model';
 import { BuildingsService } from '../core/services/buildings.service';
-import { BuildingToUser, User, MissionToUser } from '../models/User.model';
 import { ModalService } from '../core/modal/modal.service';
-import { Mission } from '../models/Mission.model';
+import { Mission, MissionToUser } from '../models/Mission.model';
 import { MissionsStore } from '../core/stores/missions.store';
 import { MissionsService } from '../core/services/missions.service';
+import { User } from '../models/User.model';
+import { VehicleStateCodes } from '../models/Vehicle.model';
 (<any>window).MSStream
+
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -139,16 +141,30 @@ export class HomePage {
   showConstructionTab: boolean;
 
   buildings: Building[]
-  buildingsToUser: BuildingToUser[] = []
-  buildingsToUserToAddToRendering: BuildingToUser[] = []
-  selectedBuilding: BuildingToUser[] = []
-  showBuildingInformations: boolean = false
+  private _buildingsToUser: BuildingToUser[] = []
 
+  set buildingsToUser(value: BuildingToUser[]) {
+    this._buildingsToUser = value
+    this.populateAvailableVehicles(value)
+  }
+
+  get buildingsToUser() {
+    return this._buildingsToUser
+  }
+
+  buildingsToUserToAddToRendering: BuildingToUser[] = []
+  selectedBuilding: BuildingToUser = null
+  showBuildingInformations: boolean = false
+  
   
   missions: Mission[] = []
   missionsToUser: MissionToUser[] = []
   missionsToUserToAddToRendering: MissionToUser[] = []
+  selectedMission: MissionToUser = null
+  showMissionInformations: boolean = false
 
+  availableVehicles = []
+  
   firstDraw = true
   isMouseDownToAddBuilding = false
   allowBuildingPlacement = false
@@ -195,6 +211,20 @@ export class HomePage {
       
     })
   }
+
+  populateAvailableVehicles(buildingsToUser: BuildingToUser[]) {
+    this.availableVehicles = []
+    console.log("TCL: HomePage -> populateAvailableVehicles -> buildingsToUser", buildingsToUser)
+    for (const building of buildingsToUser) {
+      for (const vehicleToUser of building.vehicles) {
+        if (vehicleToUser.state.code === VehicleStateCodes.available) {
+          this.availableVehicles.push(vehicleToUser)
+        }
+      }
+    }
+    console.log("TCL: HomePage -> populateAvailableVehicles -> this.availableVehicles", this.availableVehicles)
+  }
+  
   manageMissionsToUser(state) {
     if (state.user.missionsToUser.length === 0) return
 
@@ -250,8 +280,9 @@ export class HomePage {
       buildingSprite.id = building.buildingsToUserId
       buildingSprite.building = building
       buildingSprite.on('pointertap', event => {
-        console.log("HomePage -> populateMissionsContainer -> event", event.target)
-        this.selectedBuilding = event.target
+        this.selectedBuilding = event.target.building
+        console.log("TCL: HomePage -> populateBuildingsContainer -> this.selectedBuilding", this.selectedBuilding)
+        this.showBuildingInformations = true
       })
       this.buildingsContainer.addChild(buildingSprite);
       this.buildingsSprites.push(buildingSprite);
@@ -274,7 +305,9 @@ export class HomePage {
       missionSprite.id = mission.id
       missionSprite.mission = mission
       missionSprite.on('pointertap', event => {
-        console.log("HomePage -> populateMissionsContainer -> event", event.target)
+        this.selectedMission = event.target.mission
+        console.log("TCL: HomePage -> populateMissionsContainer -> this.selectedMission", this.selectedMission)
+        this.showMissionInformations = true
       })
       this.missionsContainer.addChild(missionSprite);
       this.missionsSprites.push(missionSprite); 
@@ -357,6 +390,25 @@ export class HomePage {
   onSpriteClicked(event) {
   }
 
+  randomGeo(center, radius) {
+    var y0 = center.lat;
+    var x0 = center.lng;
+    var rd = radius / 111300;
+
+    var u = Math.random();
+    var v = Math.random();
+
+    var w = rd * Math.sqrt(u);
+    var t = 2 * Math.PI * v;
+    var x = w * Math.cos(t);
+    var y = w * Math.sin(t);
+
+    return {
+        lat : y + y0,
+        lng : x + x0
+    };
+  }
+
   drawPIXIMarker() {
     // var easing = BezierEasing(0, 0, 0.25, 1);
 
@@ -398,6 +450,16 @@ export class HomePage {
 
   closeConstructionBuildingsTab() {
     this.componentStateStore.changeComponentState(ComponentStateActions.CloseConstructionTab)
+  }
+
+  closeBuildingInformations() {
+    this.showBuildingInformations = false
+    this.selectedBuilding = null
+  }
+
+  closeMissionInformations() {
+    this.showMissionInformations = false
+    this.selectedMission = null
   }
 
   startBuildingPlacement(building: Building, moneyType: string) {
@@ -458,6 +520,7 @@ export class HomePage {
     let mission = this.missions[0]
     // let latlng = {lat: 43.6098241940165, lng: 1.39453411102295}
     let latlng = {lat: 43.60684887974696, lng: 1.3940298557281494}
+    latlng = this.randomGeo(latlng, 1000)
     this.missionsService.addMission(latlng, mission)
   }
 

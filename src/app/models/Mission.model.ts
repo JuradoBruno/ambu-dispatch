@@ -9,3 +9,17 @@ export interface Mission {
     numberOfVehicleNeeded?: number
     processDurationSeconds?: number
 }
+
+export interface MissionToUser {
+    id: number,
+    missionId: number,
+    userId: number,
+    state: any,
+    createdAt: string,
+    coordinates: {
+        x: number,
+        y: number
+    },
+    address: string,
+    mission: Mission
+}

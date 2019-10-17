@@ -55,13 +55,13 @@
               <span class="section-name">Construction</span>
               <img src="assets/icon/close-white.png" alt="Close the window" class="close-right-tab-image" (click)="closeConstructionBuildingsTab()">
             </div>
-            <div class="building-type-container">
+            <div class="flex d-col">
               
               <div class="type-name">Hôpitaux</div>              
-              <div class="buildings-container">
+              <div class="flex d-col">
 
 
-                <div class="building-container" *ngFor="let building of buildings">
+                <div class="element-container" *ngFor="let building of buildings">
                   <!-- Icon & Name -->
                   <div class="left-part">
                     <img src="assets/icon/{{building.textureFileName}}.png" alt="" class="building-icon">
@@ -70,7 +70,7 @@
                   
                   <!-- Construction Time & Prices -->
                   <div class="right-part">
-                    <span class="construction-time">8h</span>
+                    <span class="low-opacity-span">8h</span>
                     <button class="building-price-container orange" (click)="startBuildingPlacement(building, 'coin')">
                       <span class="price">{{building.coinPrice}}</span>
                       <img src="assets/icon/coin.png" alt="The image representing the ingame earned money" class="building-price-image">
@@ -85,6 +85,67 @@
               </div>
             
             </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="building-informations-panel" *ngIf="showBuildingInformations">
+        <div class="padded-container shadow">
+          <!-- Buildings Section -->
+          <div class="section-header"> 
+            <span class="section-name">{{selectedBuilding.customTitle}}</span>
+            <img src="assets/icon/close-white.png" alt="Close the window" class="close-right-tab-image" (click)="closeBuildingInformations()">
+          </div>
+          <div class="flex vc d-col padding-10">
+            <span class="low-opacity-span">Niveau: {{selectedBuilding.building.level}}</span>       
+            <div class="spacer-10"></div>     
+            <span class="low-opacity-span">Adresse: {{selectedBuilding.address}}</span>            
+            <div class="spacer-10"></div>     
+            <div class="spacer-10"></div>     
+            <span class="low-opacity-span" *ngIf="selectedBuilding.building.vehicleCapacity > 0">Véhicules: {{selectedBuilding.vehicles.length}}/{{selectedBuilding.building.vehicleCapacity}}</span>            
+            <div class="spacer-10"></div>
+            
+            <div class="element-container" *ngFor="let vehicleToBuilding of selectedBuilding.vehicles">
+              <!-- Icon & Name -->
+              <div class="left-part">
+                <img src="assets/icon/ambulance-side-red.png" alt="" class="vehicle-icon padding-right">
+                <span class="low-opacity-span">{{vehicleToBuilding.vehicle.title}}</span>              
+              </div>
+                
+                <!-- Construction Time & Prices -->
+              <div class="right-part">
+                <span class="low-opacity-span">Etat: {{vehicleToBuilding.state.title}}</span>              
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="building-informations-panel" *ngIf="showMissionInformations">
+        <div class="padded-container shadow">
+          <!-- Buildings Section -->
+          <div class="section-header"> 
+            <span class="section-name">{{selectedMission.mission.title}}</span>
+            <img src="assets/icon/close-white.png" alt="Close the window" class="close-right-tab-image" (click)="closeMissionInformations()">
+          </div>
+          <div class="flex vc d-col padding-10">
+            <span class="low-opacity-span">Adresse: {{selectedMission.address}}</span>            
+            <div class="spacer-10"></div>     
+            
+            <div class="element-container" *ngFor="let vehicleToBuilding of availableVehicles">
+              <!-- Icon & Name -->
+              <div class="left-part">
+                <img src="assets/icon/ambulance-side-red.png" alt="" class="vehicle-icon padding-right">
+                <span class="low-opacity-span">{{vehicleToBuilding.vehicle.title}}</span>              
+              </div>
+                
+                <!-- Construction Time & Prices -->
+              <div class="right-part">
+                <span class="low-opacity-span">Etat: {{vehicleToBuilding.state.title}}</span>              
+              </div>
+            </div>
+
           </div>
         </div>
       </div>

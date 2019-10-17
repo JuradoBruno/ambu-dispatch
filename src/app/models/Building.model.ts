@@ -1,3 +1,6 @@
+import { VehicleToUserBuilding } from './Vehicle.model'
+import { Coordinates } from './Coordinates.model'
+
 export class Building{
     buildingCore: {
         title: string,
@@ -19,9 +22,20 @@ export class Building{
         x: number,
         y: number
     }
+    
 
     constructor(building?: any) {
         Object.assign(this, building)
     }
 }
 
+export interface BuildingToUser {
+    buildingsToUserId: number
+    buildingId: number
+    userId: number
+    createdAt: string
+    coordinates: Coordinates
+    address: string,
+    building: Building
+    vehicles: VehicleToUserBuilding[]
+}

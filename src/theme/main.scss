@@ -23,6 +23,20 @@ $element-height: 35px;
     border: solid 3px $red-main;
 }
 
+.padding-10 {
+    padding: 10px;
+}
+
+.spacer-10 {
+    height: 10px;
+}
+.spacer-15 {
+    height: 15px;
+}
+.spacer-20 {
+    height: 20px;
+}
+
 .flex {
     display: flex;
     &.d-row {
