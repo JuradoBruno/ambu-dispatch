@@ -9,15 +9,15 @@ export class User {
     salt: string
     coinMoney: number
     cashMoney: number
-    buildingsToUser: IBuildingToUser[]
-    missionsToUser: IMissionToUser[]
+    buildingsToUser: BuildingToUser[]
+    missionsToUser: MissionToUser[]
     
     constructor(user?: any) {
         Object.assign(this, user)
     }
 }
 
-export interface IBuildingToUser {
+export interface BuildingToUser {
     buildingsToUserId: number,
     buildingId: number,
     userId: number,
@@ -30,7 +30,7 @@ export interface IBuildingToUser {
     building: Building
 }
 
-export interface IMissionToUser {
+export interface MissionToUser {
     id: number,
     missionId: number,
     userId: number,

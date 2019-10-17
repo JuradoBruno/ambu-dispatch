@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ObservableStore } from '@codewithdan/observable-store';
 import { IStoreState } from 'src/app/core/stores/store-state.interface';
 import { Building } from 'src/app/models/Building.model';
-import { IBuildingToUser } from '../../models/User.model';
+import { BuildingToUser } from '../../models/User.model';
 
 @Injectable()
 export class BuildingsStore extends ObservableStore<IStoreState>{
@@ -38,7 +38,7 @@ export class BuildingsStore extends ObservableStore<IStoreState>{
         this.setState(this.initialState, BuildingsActions.InitState)
     }
 
-    storeBuildingsToUser(buildingsToUser: IBuildingToUser[]) {
+    storeBuildingsToUser(buildingsToUser: BuildingToUser[]) {
         this.setState({ buildingsToUser }, BuildingsActions.StoreBuildingsToUser)
     }
 
@@ -55,5 +55,5 @@ export enum BuildingsActions {
 
 export interface IBuildingsStore {
     buildings: Building[],
-    buildingsToUser: IBuildingToUser[]
+    buildingsToUser: BuildingToUser[]
 }

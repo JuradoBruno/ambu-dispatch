@@ -1,5 +1,5 @@
 import { Building } from '../../models/Building.model';
-import { IBuildingToUser } from '../../models/User.model';
+import { BuildingToUser } from '../../models/User.model';
 import { Mission } from '../../models/Mission.model';
 
 export interface IStoreState {
@@ -8,7 +8,7 @@ export interface IStoreState {
     showSigninComponent: boolean
     showConstuctionTab: boolean
     user: any
-    buildingsToUser: IBuildingToUser[];
+    buildingsToUser: BuildingToUser[];
     buildings: Building[]
     missions: Mission[]
 }

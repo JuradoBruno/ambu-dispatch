@@ -19,7 +19,7 @@ import { UserStore } from '../core/stores/user.store';
 import { BuildingsStore } from '../core/stores/buildings.store';
 import { Building } from '../models/Building.model';
 import { BuildingsService } from '../core/services/buildings.service';
-import { IBuildingToUser, User, IMissionToUser } from '../models/User.model';
+import { BuildingToUser, User, MissionToUser } from '../models/User.model';
 import { ModalService } from '../core/modal/modal.service';
 import { Mission } from '../models/Mission.model';
 import { MissionsStore } from '../core/stores/missions.store';
@@ -137,13 +137,17 @@ export class HomePage {
   coinMoney: any;
   cashMoney: any;
   showConstructionTab: boolean;
+
   buildings: Building[]
-  buildingsToUser: IBuildingToUser[] = []
-  buildingsToUserToAddToRendering: IBuildingToUser[] = []  
+  buildingsToUser: BuildingToUser[] = []
+  buildingsToUserToAddToRendering: BuildingToUser[] = []
+  selectedBuilding: BuildingToUser[] = []
+  showBuildingInformations: boolean = false
+
   
   missions: Mission[] = []
-  missionsToUser: IMissionToUser[] = []
-  missionsToUserToAddToRendering: IMissionToUser[] = []
+  missionsToUser: MissionToUser[] = []
+  missionsToUserToAddToRendering: MissionToUser[] = []
 
   firstDraw = true
   isMouseDownToAddBuilding = false
@@ -246,6 +250,8 @@ export class HomePage {
       buildingSprite.id = building.buildingsToUserId
       buildingSprite.building = building
       buildingSprite.on('pointertap', event => {
+        console.log("HomePage -> populateMissionsContainer -> event", event.target)
+        this.selectedBuilding = event.target
       })
       this.buildingsContainer.addChild(buildingSprite);
       this.buildingsSprites.push(buildingSprite);
@@ -268,7 +274,7 @@ export class HomePage {
       missionSprite.id = mission.id
       missionSprite.mission = mission
       missionSprite.on('pointertap', event => {
-        console.log("HomePage -> populateMissionsContainer -> event", event.target.mission)
+        console.log("HomePage -> populateMissionsContainer -> event", event.target)
       })
       this.missionsContainer.addChild(missionSprite);
       this.missionsSprites.push(missionSprite); 
@@ -544,10 +550,10 @@ export class HomePage {
 
 export class BuildingSprite extends PIXI.Sprite {
   id: number
-  building: IBuildingToUser
+  building: BuildingToUser
 }
 
 export class MissionSprite extends PIXI.Sprite {
   id: number
-  mission: IMissionToUser
+  mission: MissionToUser
 }
