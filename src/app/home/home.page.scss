@@ -1,5 +1,6 @@
 @import "../../theme/colors.scss";
 
+$border-radius: 8px;
 
 .main-container {
     width: 100vw;
@@ -101,14 +102,14 @@
         .right-column {
             width: 100%;
             background-color: rgba(0, 0, 0, 0.4);
-            border-top-right-radius: 8px;
-            border-top-left-radius: 8px;
+            border-top-right-radius: $border-radius;
+            border-top-left-radius: $border-radius;
             
         }
     }
 }
 
-.building-informations-panel {
+.absolute-information-panel {
     position: absolute;
     z-index: 1;
     top: 0;
@@ -123,29 +124,37 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
 }
 
 .padded-container {
     background-color: $grey-deep;
-    margin: 7px 7px 0px 7px;
-    border-top-right-radius: 8px;
-    border-top-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-    border-bottom-left-radius: 8px;
-    height: 100%;
+    border-top-right-radius: $border-radius;
+    border-top-left-radius: $border-radius;
+    border-bottom-right-radius: $border-radius;
+    border-bottom-left-radius: $border-radius;
     
-    &.shadow {
-        box-shadow: 0px 0px 22px -5px rgba(0,0,0,1);
+    &.building-tab {
+        height: 80%;        
+        margin: 7px 7px 0px 7px;
+    }
+    
+    &.mission-information {
         height: 80%;
         min-width: 50%;
+        margin: 7px;
     }
+
+    &.shadow {
+        box-shadow: 0px 0px 22px -5px rgba(0,0,0,1);
+    }    
     
 }
 
 .section-header {
     background-color: $blue-main;
-    border-top-right-radius: 8px;
-    border-top-left-radius: 8px;
+    border-top-right-radius: $border-radius;
+    border-top-left-radius: $border-radius;
     padding: 8px 10px 5px 10px;
     display: flex;
     justify-content: space-between;
@@ -162,6 +171,11 @@
         width: 15px;
         height: auto;
     }       
+}
+
+.sub-header {
+    // height: 100%;
+    // overflow: scroll;
 }
 
 .element-container {
@@ -209,9 +223,8 @@
 }                                
 
 
-.building-price-container {
+.button-price-icon {
     min-width: 90px;
-    height: 70%;
     margin-left: 10px;
     border-radius: 5px;
     position: relative;
@@ -222,6 +235,10 @@
     padding-top: 5px;
     padding-bottom: 5px;
 
+    &.small {
+        min-width: 60px;
+    }
+
     &.orange {
         background-color: $orange-coin;
         padding-right: 25px;                                       
@@ -230,6 +247,9 @@
         background-color: $green-cash;
         padding-right: 30px;
     }    
+    &.no-padding-right {
+        padding-right: 0px;
+    }
     .price {
         color: $white-custom;
     }
@@ -238,6 +258,12 @@
         position: absolute;
         right: 3px;
     }
+}
+
+.mission-img-tab {
+    max-width: 50px;
+    max-height: 40px;
+    margin-right: 15px;
 }
 
 .leaflet-control-minimap {

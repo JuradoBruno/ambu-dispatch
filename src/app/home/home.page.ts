@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import * as L from 'leaflet';
 import * as PIXI from 'pixi.js'
 import * as _ from 'lodash'
@@ -24,7 +24,7 @@ import { Mission, MissionToUser } from '../models/Mission.model';
 import { MissionsStore } from '../core/stores/missions.store';
 import { MissionsService } from '../core/services/missions.service';
 import { User } from '../models/User.model';
-import { VehicleStateCodes } from '../models/Vehicle.model';
+import { VehicleStateCodes, VehicleToUserBuilding } from '../models/Vehicle.model';
 (<any>window).MSStream
 
 @Component({
@@ -32,7 +32,7 @@ import { VehicleStateCodes } from '../models/Vehicle.model';
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
-export class HomePage {
+export class HomePage implements OnInit {
   subs = new SubSink()
 
   user: User
@@ -118,9 +118,11 @@ export class HomePage {
   pixiOverlay: any;
   allSprites: PIXI.Sprite[] | any[] = []
   markerSprites: any[] = []
+
   buildingsSprites: PIXI.Sprite[] | any[] = []
   pixiContainer: PIXI.Container = new PIXI.Container()
   buildingsContainer: PIXI.Container = new PIXI.Container() 
+
   missionsSprites: PIXI.Sprite[] | any[] = [] 
   missionsContainer: PIXI.Container = new PIXI.Container()  
   vehiclesContainer: PIXI.Container = new PIXI.Container()  
@@ -154,8 +156,7 @@ export class HomePage {
 
   buildingsToUserToAddToRendering: BuildingToUser[] = []
   selectedBuilding: BuildingToUser = null
-  showBuildingInformations: boolean = false
-  
+  showBuildingInformations: boolean = false  
   
   missions: Mission[] = []
   missionsToUser: MissionToUser[] = []
@@ -164,6 +165,7 @@ export class HomePage {
   showMissionInformations: boolean = false
 
   availableVehicles = []
+  selectedVehiclesForMission = []
   
   firstDraw = true
   isMouseDownToAddBuilding = false
@@ -197,8 +199,11 @@ export class HomePage {
   listenToUserState() {
     this.subs.sink = this.userStore.stateChanged.subscribe((state: IStoreState) => {
       if (!state.user) {
-        this.authService.getUser()
-        return
+          this.authService.getUser().catch(error => {
+            console.error("TCL: HomePage -> listenToUserState -> error", error)
+            this.signout()            
+          })
+          return
       }
       this.user = state.user
         
@@ -214,7 +219,6 @@ export class HomePage {
 
   populateAvailableVehicles(buildingsToUser: BuildingToUser[]) {
     this.availableVehicles = []
-    console.log("TCL: HomePage -> populateAvailableVehicles -> buildingsToUser", buildingsToUser)
     for (const building of buildingsToUser) {
       for (const vehicleToUser of building.vehicles) {
         if (vehicleToUser.state.code === VehicleStateCodes.available) {
@@ -222,7 +226,30 @@ export class HomePage {
         }
       }
     }
-    console.log("TCL: HomePage -> populateAvailableVehicles -> this.availableVehicles", this.availableVehicles)
+  }
+
+  selectVehicleForMission(vehicle: VehicleToUserBuilding) {
+    // We remove it if it is selected
+    if (vehicle.isSelected == true) {
+      this.selectedVehiclesForMission = this.selectedVehiclesForMission.filter(vehicle => vehicle.id !== vehicle.id)  
+      vehicle.isSelected = false
+      return
+    }
+    this.selectedVehiclesForMission.push(vehicle)
+    vehicle.isSelected = true
+  }
+
+  cleanUpTheSelectedVehiclesForMission() {
+    for (const vehicle of this.selectedVehiclesForMission) vehicle.isSelected = false
+    this.selectedVehiclesForMission = []    
+  }
+  
+  engageVehiclesOnMission(selectedMission) {
+     this.cleanUpTheSelectedVehiclesForMission()
+  }
+
+  payToEndMission(selectedMission) {
+
   }
   
   manageMissionsToUser(state) {
@@ -460,6 +487,7 @@ export class HomePage {
   closeMissionInformations() {
     this.showMissionInformations = false
     this.selectedMission = null
+    this.cleanUpTheSelectedVehiclesForMission()
   }
 
   startBuildingPlacement(building: Building, moneyType: string) {

@@ -1,5 +1,5 @@
 import { VehicleToUserBuilding } from './Vehicle.model'
-import { Coordinates } from './Coordinates.model'
+import { ICoordinates } from './Coordinates.model'
 
 export class Building{
     buildingCore: {
@@ -34,7 +34,7 @@ export interface BuildingToUser {
     buildingId: number
     userId: number
     createdAt: string
-    coordinates: Coordinates
+    coordinates: ICoordinates
     address: string,
     building: Building
     vehicles: VehicleToUserBuilding[]

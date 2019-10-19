@@ -22,6 +22,7 @@ export class VehicleToUserBuilding {
     buildingToUserId: number
     state: VehicleState
     stateId: number
+    isSelected?: boolean
 }
 
 export interface VehicleState {

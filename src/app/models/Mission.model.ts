@@ -23,3 +23,9 @@ export interface MissionToUser {
     address: string,
     mission: Mission
 }
+
+export interface MissionToUserState {
+    id: number
+    title: string
+    description?: string
+}

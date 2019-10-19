@@ -1,18 +1,14 @@
-
 <ion-content>
   <div class="main-container">
     <div class="map-container" (press)="onPress($event)" (pressup)="onPressUp($event)">
-  
-      <div leaflet
-          class="main-map"
-          [leafletOptions]="mainMapOptions"
-          (leafletMapReady)="onMapAlmostReady($event)">        
+
+      <div leaflet class="main-map" [leafletOptions]="mainMapOptions" (leafletMapReady)="onMapAlmostReady($event)">
       </div>
-  
-    </div> 
-  
-     <div class="interface-container">
-      
+
+    </div>
+
+    <div class="interface-container">
+
       <ion-button class="square-button" color="danger" (click)="signout()">X</ion-button>
       <ion-button class="square-button mission" color="warning" (click)="spawnMission()">!</ion-button>
 
@@ -22,22 +18,23 @@
         <div class="game-coins-container">
           <img src="assets/icon/coin.png" alt="The image representing the ingame earned money" class="coin-image">
           <div class="game-coins-ruban">
-              <span class="money-amount-span">{{coinMoney}}</span>
+            <span class="money-amount-span">{{coinMoney}}</span>
           </div>
         </div>
-  
+
         <!-- Cash Money -->
         <div class="game-coins-container">
           <img src="assets/icon/cash.png" alt="The image representing the ingame earned money" class="coin-image">
           <div class="game-coins-ruban cash">
-              <span class="money-amount-span">{{cashMoney}}</span>
+            <span class="money-amount-span">{{cashMoney}}</span>
           </div>
         </div>
       </div>
 
       <!-- Right Bottom Buttons -->
       <div class="bottom-right-buttons-container">
-        <img src="assets/icon/buildings.png" alt="Acheter un batiment" (click)="openConstructionTab()" class="buildings-image">
+        <img src="assets/icon/buildings.png" alt="Acheter un batiment" (click)="openConstructionTab()"
+          class="buildings-image">
       </div>
 
       <!-- Right Half Screen Panels -->
@@ -49,15 +46,16 @@
           </div> -->
         </div>
         <div class="right-column">
-          <div class="padded-container">
+          <div class="padded-container building-tab">
             <!-- Buildings Section -->
-            <div class="section-header"> 
+            <div class="section-header">
               <span class="section-name">Construction</span>
-              <img src="assets/icon/close-white.png" alt="Close the window" class="close-right-tab-image" (click)="closeConstructionBuildingsTab()">
+              <img src="assets/icon/close-white.png" alt="Close the window" class="close-right-tab-image"
+                (click)="closeConstructionBuildingsTab()">
             </div>
             <div class="flex d-col">
-              
-              <div class="type-name">Hôpitaux</div>              
+
+              <div class="type-name">Hôpitaux</div>
               <div class="flex d-col">
 
 
@@ -67,54 +65,58 @@
                     <img src="assets/icon/{{building.textureFileName}}.png" alt="" class="building-icon">
                     <span class="building-name">{{building.buildingCore.title}}</span>
                   </div>
-                  
+
                   <!-- Construction Time & Prices -->
                   <div class="right-part">
                     <span class="low-opacity-span">8h</span>
-                    <button class="building-price-container orange" (click)="startBuildingPlacement(building, 'coin')">
+                    <button class="button-price-icon orange" (click)="startBuildingPlacement(building, 'coin')">
                       <span class="price">{{building.coinPrice}}</span>
-                      <img src="assets/icon/coin.png" alt="The image representing the ingame earned money" class="building-price-image">
+                      <img src="assets/icon/coin.png" alt="The image representing the ingame earned money"
+                        class="building-price-image">
                     </button>
-                    <button class="building-price-container green" (click)="startBuildingPlacement(building, 'cash')">
+                    <button class="button-price-icon green" (click)="startBuildingPlacement(building, 'cash')">
                       <span class="price">{{building.cashPrice}}</span>
-                      <img src="assets/icon/cash.png" alt="The image representing the ingame earned money" class="building-price-image">
+                      <img src="assets/icon/cash.png" alt="The image representing the ingame earned money"
+                        class="building-price-image">
                     </button>
                   </div>
                 </div>
 
               </div>
-            
+
             </div>
           </div>
         </div>
       </div>
-      
-      <div class="building-informations-panel" *ngIf="showBuildingInformations">
-        <div class="padded-container shadow">
+
+      <div class="absolute-information-panel" *ngIf="showBuildingInformations">
+        <div class="padded-container building-tab shadow">
           <!-- Buildings Section -->
-          <div class="section-header"> 
+          <div class="section-header">
             <span class="section-name">{{selectedBuilding.customTitle}}</span>
-            <img src="assets/icon/close-white.png" alt="Close the window" class="close-right-tab-image" (click)="closeBuildingInformations()">
+            <img src="assets/icon/close-white.png" alt="Close the window" class="close-right-tab-image"
+              (click)="closeBuildingInformations()">
           </div>
           <div class="flex vc d-col padding-10">
-            <span class="low-opacity-span">Niveau: {{selectedBuilding.building.level}}</span>       
-            <div class="spacer-10"></div>     
-            <span class="low-opacity-span">Adresse: {{selectedBuilding.address}}</span>            
-            <div class="spacer-10"></div>     
-            <div class="spacer-10"></div>     
-            <span class="low-opacity-span" *ngIf="selectedBuilding.building.vehicleCapacity > 0">Véhicules: {{selectedBuilding.vehicles.length}}/{{selectedBuilding.building.vehicleCapacity}}</span>            
+            <span class="low-opacity-span">Niveau: {{selectedBuilding.building.level}}</span>
             <div class="spacer-10"></div>
-            
+            <span class="low-opacity-span">Adresse: {{selectedBuilding.address}}</span>
+            <div class="spacer-10"></div>
+            <div class="spacer-10"></div>
+            <span class="low-opacity-span" *ngIf="selectedBuilding.building.vehicleCapacity > 0">Véhicules:
+              {{selectedBuilding.vehicles.length}}/{{selectedBuilding.building.vehicleCapacity}}</span>
+            <div class="spacer-10"></div>
+
             <div class="element-container" *ngFor="let vehicleToBuilding of selectedBuilding.vehicles">
               <!-- Icon & Name -->
               <div class="left-part">
                 <img src="assets/icon/ambulance-side-red.png" alt="" class="vehicle-icon padding-right">
-                <span class="low-opacity-span">{{vehicleToBuilding.vehicle.title}}</span>              
+                <span class="low-opacity-span">{{vehicleToBuilding.vehicle.title}}</span>
               </div>
-                
-                <!-- Construction Time & Prices -->
+
+              <!-- Construction Time & Prices -->
               <div class="right-part">
-                <span class="low-opacity-span">Etat: {{vehicleToBuilding.state.title}}</span>              
+                <span class="low-opacity-span">Etat: {{vehicleToBuilding.state.title}}</span>
               </div>
             </div>
 
@@ -122,30 +124,108 @@
         </div>
       </div>
 
-      <div class="building-informations-panel" *ngIf="showMissionInformations">
-        <div class="padded-container shadow">
-          <!-- Buildings Section -->
-          <div class="section-header"> 
-            <span class="section-name">{{selectedMission.mission.title}}</span>
-            <img src="assets/icon/close-white.png" alt="Close the window" class="close-right-tab-image" (click)="closeMissionInformations()">
-          </div>
-          <div class="flex vc d-col padding-10">
-            <span class="low-opacity-span">Adresse: {{selectedMission.address}}</span>            
-            <div class="spacer-10"></div>     
-            
-            <div class="element-container" *ngFor="let vehicleToBuilding of availableVehicles">
-              <!-- Icon & Name -->
-              <div class="left-part">
-                <img src="assets/icon/ambulance-side-red.png" alt="" class="vehicle-icon padding-right">
-                <span class="low-opacity-span">{{vehicleToBuilding.vehicle.title}}</span>              
-              </div>
-                
-                <!-- Construction Time & Prices -->
-              <div class="right-part">
-                <span class="low-opacity-span">Etat: {{vehicleToBuilding.state.title}}</span>              
-              </div>
-            </div>
 
+
+      <div class="absolute-information-panel mission-information" *ngIf="showMissionInformations">
+        <div class="padded-container mission-information shadow">
+          <div class="flex d-col h-100">
+            <!-- Missions Section -->
+            <div class="section-header">
+              <span class="section-name">{{selectedMission.mission.title}}</span>
+              <img src="assets/icon/close-white.png" alt="Close the window" class="close-right-tab-image"
+                (click)="closeMissionInformations()">
+            </div>
+            <!-- Main Container -->
+            <div class="flex d-col padding-10 h-100">
+              <!-- Top Part -->
+              <div class="flex d-row s-between w-100">
+                <!-- Left Part -->
+                <div class="flex d-row">
+                  <img src="{{missionTextureUri}}" alt="" class="mission-img-tab">
+                  <div class="flex d-col">
+                    <span class="low-opacity-span">{{selectedMission.address}}</span>
+                    <span class="low-opacity-span">{{selectedMission.state.title}}</span>
+                    <span class="low-opacity-span">Nombre de véhicule nécessaire: {{selectedMission.mission.numberOfVehicleNeeded}}</span>
+
+                  </div>
+                </div>
+                <!-- Right Part -->
+                <div class="flex d-col f-end">
+                  <!-- Pay to End -->
+                  <div class="flex d-row vc">
+                    <!-- <span class="low-opacity-span">Terminer</span>             -->
+                    <button class="button-price-icon green small" (click)="payToEndMission(selectedMission)">
+                      <span class="price">Terminer: 2</span>
+                      <img src="assets/icon/cash.png" alt="The image representing the ingame earned money"
+                        class="building-price-image">
+                    </button>
+                  </div>
+                  <!-- Engage vehicles -->
+                  <div class="pt-10">
+                    <button class="button-price-icon green no-padding-right" 
+                      [ngClass]="{
+                        'disabled' : selectedVehiclesForMission.length !== selectedMission.mission.numberOfVehicleNeeded,
+                        'green': selectedVehiclesForMission.length == selectedMission.mission.numberOfVehicleNeeded
+                      }"
+                      (click)="engageVehiclesOnMission(selectedMission)">
+                      <span class="price">Engager</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="flex d-col w-100">
+                <div class="spacer-10"></div>
+
+                <!--Table-->
+                <table id="tablePreview" class="table-vehicles">
+                  <!--Table head-->
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Nom</th>
+                      <th>Distance</th>
+                      <th>Etat</th>
+                      <th>Selection</th>
+                    </tr>
+                  </thead>
+                  <!--Table head-->
+                  <!--Table body-->
+                  <tbody>
+                    <tr *ngFor="let vehicleToBuilding of availableVehicles">
+                      <td class="txt-center">
+                        <img src="assets/icon/ambulance-side-red.png" alt="" class="vehicle-icon padding-right">
+                      </td>
+                      <td class="txt-center">
+                        <span class="low-opacity-span">{{vehicleToBuilding.vehicle.title}}</span>
+                      </td>
+                      <td class="txt-center">
+                        <span class="low-opacity-span">{{vehicleToBuilding.coordinates | getDistance:selectedMission.coordinates}}</span>
+                      </td>
+                      <td class="txt-center">
+                        <span class="low-opacity-span">{{vehicleToBuilding.state.title}}</span>
+                      </td>
+                      <td class="txt-center">
+                        <div class="flex vc">
+                          <button class="button-price-icon green no-padding-right" 
+                            [ngClass]="{
+                              'disabled-1': selectedVehiclesForMission.length >= selectedMission.mission.numberOfVehicleNeeded && !vehicleToBuilding.isSelected,
+                              'green': vehicleToBuilding.isSelected
+                            }"
+                            (click)="selectVehicleForMission(vehicleToBuilding)">
+                            <span class="price">Selectionner</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                  <!--Table body-->
+                </table>
+                <!--Table-->
+              </div>
+
+              <!-- Available Vehicles -->
+
+            </div>
           </div>
         </div>
       </div>
@@ -165,7 +245,7 @@
         <ion-button color="danger" class="mission-button mission" (click)="getTheTruckMoving({})" [disabled]="disableMissionButton">Transférer un patient</ion-button>
         <ion-button color="secondary" class="mission-button routing" (click)="addRouting()">Start routing</ion-button>
       </div> -->
-  
+
     </div>
   </div>
 </ion-content>

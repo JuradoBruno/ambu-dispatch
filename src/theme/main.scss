@@ -27,6 +27,14 @@ $element-height: 35px;
     padding: 10px;
 }
 
+.scroll {
+    overflow: scroll;
+}
+
+.scroll::-webkit-scrollbar { 
+    width: 0 !important 
+}
+
 .spacer-10 {
     height: 10px;
 }
@@ -51,6 +59,22 @@ $element-height: 35px;
     &.hc { // horizontal center
         align-items: center;
     }
+}
+
+.pt-10 {
+    padding-top: 10px;
+}
+
+.pt-15 {
+    padding-top: 15px;
+}
+
+.f-end {
+    align-items: flex-end;
+}
+
+.s-between {
+    justify-content: space-between;
 }
 
 .p-abs {
@@ -167,6 +191,26 @@ $element-height: 35px;
 }
 
 // MAIN BUTTON : class="btn btn-2 btn-2h red"
+.txt-center {
+    text-align: center;
+}
+
+
+.table-vehicles {
+    thead {
+        background-color: brown;  
+        margin-bottom: 10px;
+    }
+    tr {
+        color: white;
+    }
+    th {
+        padding: 5px;
+    }
+    td {
+        padding: 5px 0px;        
+    }
+}
 
 .btn {
     display: flex;
