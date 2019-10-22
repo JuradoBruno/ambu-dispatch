@@ -1,36 +1,26 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { HttpClient } from '@angular/common/http';
-import { Mission } from '../../models/Mission.model';
-import { MissionsStore } from '../stores/missions.store';
 import { BaseHttpService } from './base-http.service';
-import { UserStore } from '../stores/user.store';
 import { ModalService } from '../modal/modal.service';
-import { User } from '../../models/User.model';
+import { Mission } from '../../models/Mission.model';
 import { VehicleToUserBuilding } from '../../models/Vehicle.model';
+import { HttpClient } from '@angular/common/http';
+import { EngageVehiclesToMissionDto } from '../../models/dtos';
 
 @Injectable()
-export class MissionsService {
+export class VehiclesService {
     baseUrl = environment.baseUrl
-    missionsUrl = this.baseUrl + 'missions'
+    vehiclesUrl = this.baseUrl + 'vehicles'
     constructor(
         private http: HttpClient,
         private baseHttpService: BaseHttpService,
-        private storeMissions: MissionsStore,
-        private userStore: UserStore,
         private modal: ModalService
     ) { }
 
-    getMissions() {
-        this.http.get<Mission[]>(this.missionsUrl).toPromise().then((missions: Mission[]) => {
-            this.storeMissions.storeMissions(missions)
-        })
-    }
-
-    addMission(latlng, mission: Mission) {
+    engageVehicles(missionToUser: Mission, vehiclesToUserBuilding: VehicleToUserBuilding[]) {
         let headers = this.baseHttpService.returnHeaders()
-        return this.http.post(this.missionsUrl + '/by-coordinates', { latlng, mission }, { headers }).toPromise().then((user: User) => {
-            this.userStore.storeCurrentUser(user)
+        return this.http.post(this.vehiclesUrl + '/engage-to-mission', { missionToUser, vehiclesToUserBuilding }, { headers }).toPromise().then((engageVehiclesToMissionDto: EngageVehiclesToMissionDto) => {
+            console.log("TCL: VehiclesService -> engageVehicles -> engageVehiclesToMissionDto", engageVehiclesToMissionDto)
         }).catch(error => this.handleError(error))
     }
 

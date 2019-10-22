@@ -32,6 +32,7 @@ export class Building{
 export interface BuildingToUser {
     buildingsToUserId: number
     buildingId: number
+    customTitle: string
     userId: number
     createdAt: string
     coordinates: ICoordinates

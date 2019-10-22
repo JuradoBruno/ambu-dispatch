@@ -13,6 +13,7 @@ import { BuildingsService } from './services/buildings.service';
 import { AuthGuard } from './services/auth-guard.service';
 import { MissionsService } from './services/missions.service';
 import { MissionsStore } from './stores/missions.store';
+import { VehiclesService } from './services/vehicles.service';
 
 @NgModule({
   declarations: [],
@@ -35,6 +36,7 @@ import { MissionsStore } from './stores/missions.store';
     BuildingsService,
     MissionsService,
     MissionsStore,
+    VehiclesService,
     UserStore,
     BaseHttpService,
     AuthGuard

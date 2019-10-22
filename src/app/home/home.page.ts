@@ -25,6 +25,7 @@ import { MissionsStore } from '../core/stores/missions.store';
 import { MissionsService } from '../core/services/missions.service';
 import { User } from '../models/User.model';
 import { VehicleStateCodes, VehicleToUserBuilding } from '../models/Vehicle.model';
+import { VehiclesService } from '../core/services/vehicles.service';
 (<any>window).MSStream
 
 @Component({
@@ -182,6 +183,7 @@ export class HomePage implements OnInit {
     private buildingsStore: BuildingsStore,
     private missionsService: MissionsService,
     private missionsStore: MissionsStore,
+    private vehiclesService: VehiclesService,
     private componentStateStore: ComponentsStateStore) { }
 
   ngOnInit() {
@@ -240,12 +242,13 @@ export class HomePage implements OnInit {
   }
 
   cleanUpTheSelectedVehiclesForMission() {
-    for (const vehicle of this.selectedVehiclesForMission) vehicle.isSelected = false
+    for (const vehicle of this.selectedVehiclesForMission) delete vehicle.isSelected
     this.selectedVehiclesForMission = []    
   }
   
   engageVehiclesOnMission(selectedMission) {
-     this.cleanUpTheSelectedVehiclesForMission()
+    this.cleanUpTheSelectedVehiclesForMission()
+    this.vehiclesService.engageVehicles(selectedMission, this.selectedVehiclesForMission)
   }
 
   payToEndMission(selectedMission) {
