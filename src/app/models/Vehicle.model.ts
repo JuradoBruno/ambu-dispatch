@@ -33,5 +33,6 @@ export interface VehicleState {
 }
 
 export enum VehicleStateCodes {
-    available = "1"
+    Disponible = "1",
+    EnDirectionDeLaMission = '2'
 }

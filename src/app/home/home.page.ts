@@ -120,54 +120,53 @@ export class HomePage implements OnInit {
   allSprites: PIXI.Sprite[] | any[] = []
   markerSprites: any[] = []
 
-  buildingsSprites: PIXI.Sprite[] | any[] = []
   pixiContainer: PIXI.Container = new PIXI.Container()
-  buildingsContainer: PIXI.Container = new PIXI.Container() 
-
-  missionsSprites: PIXI.Sprite[] | any[] = [] 
-  missionsContainer: PIXI.Container = new PIXI.Container()  
-  vehiclesContainer: PIXI.Container = new PIXI.Container()  
-
   pixiLoader = new PIXI.Loader();
-  
-  hopitalTextureUri = 'assets/icon/hopital-texture.png'
-  hopitalTexture: PIXI.Texture
-  
-  caserneAmbulanceTextureUri = 'assets/icon/caserne-ambulance.png'
-  caserneAmbulanceTexture: PIXI.Texture
-  
-  missionTextureUri = 'assets/icon/excla-1.png'
-  missionTexture: PIXI.Texture
-
-  coinMoney: any;
-  cashMoney: any;
-  showConstructionTab: boolean;
-
-  buildings: Building[]
-  private _buildingsToUser: BuildingToUser[] = []
-
-  set buildingsToUser(value: BuildingToUser[]) {
-    this._buildingsToUser = value
-    this.populateAvailableVehicles(value)
-  }
-
-  get buildingsToUser() {
-    return this._buildingsToUser
-  }
-
-  buildingsToUserToAddToRendering: BuildingToUser[] = []
-  selectedBuilding: BuildingToUser = null
-  showBuildingInformations: boolean = false  
   
   missions: Mission[] = []
   missionsToUser: MissionToUser[] = []
   missionsToUserToAddToRendering: MissionToUser[] = []
   selectedMission: MissionToUser = null
   showMissionInformations: boolean = false
+  missionsContainer: PIXI.Container = new PIXI.Container()  
+  missionsSprites: PIXI.Sprite[] | any[] = [] 
+  missionTextureUri = 'assets/icon/excla-1.png'
+  missionTexture: PIXI.Texture
+  
+  vehiclesContainer: PIXI.Container = new PIXI.Container()  
+  vehiclesSprites: PIXI.Sprite[] | any[] = []
+  vehicleAmbu1TextureUri = 'assets/icon/ambu-1.png'
+  vehicleSuper1TextureUri = 'assets/icon/super-2.png'
+  vehicleAmbu1Texture: PIXI.Texture
+  vehicleSuper1Texture: PIXI.Texture
 
+  buildings: Building[]
+  private _buildingsToUser: BuildingToUser[] = []
+  set buildingsToUser(value: BuildingToUser[]) {
+    this._buildingsToUser = value
+    this.populateVehicleArrays(value)
+  }
+
+  get buildingsToUser() {
+    return this._buildingsToUser
+  }
+  buildingsToUserToAddToRendering: BuildingToUser[] = []
+  selectedBuilding: BuildingToUser = null
+  showBuildingInformations: boolean = false  
+  buildingsContainer: PIXI.Container = new PIXI.Container() 
+  buildingsSprites: PIXI.Sprite[] | any[] = []
+  hopitalTextureUri = 'assets/icon/hopital-texture.png'
+  hopitalTexture: PIXI.Texture
+  caserneAmbulanceTextureUri = 'assets/icon/caserne-ambulance.png'
+  caserneAmbulanceTexture: PIXI.Texture
+  
   availableVehicles = []
   selectedVehiclesForMission = []
-  
+  goingToMissionVehicles = []
+
+  coinMoney: any;
+  cashMoney: any;
+  showConstructionTab: boolean;
   firstDraw = true
   isMouseDownToAddBuilding = false
   allowBuildingPlacement = false
@@ -214,20 +213,25 @@ export class HomePage implements OnInit {
 
       this.manageBuildingsToUser(state)
       this.manageMissionsToUser(state)
+      this.manageVehiclesToBuildingsTouser(state)
       this.container
       
     })
   }
 
-  populateAvailableVehicles(buildingsToUser: BuildingToUser[]) {
-    this.availableVehicles = []
+  
+
+  populateVehicleArrays(buildingsToUser: BuildingToUser[]) {
+    let availableVehiclesTemp = []
+    let goingToMissionVehiclesTemp = []
     for (const building of buildingsToUser) {
       for (const vehicleToUser of building.vehicles) {
-        if (vehicleToUser.state.code === VehicleStateCodes.available) {
-          this.availableVehicles.push(vehicleToUser)
-        }
+        if (vehicleToUser.state.code === VehicleStateCodes.Disponible) availableVehiclesTemp.push(vehicleToUser)
+        if (vehicleToUser.state.code === VehicleStateCodes.EnDirectionDeLaMission) goingToMissionVehiclesTemp.push(vehicleToUser)
       }
     }
+    this.goingToMissionVehicles = goingToMissionVehiclesTemp
+    this.availableVehicles = availableVehiclesTemp
   }
 
   selectVehicleForMission(vehicle: VehicleToUserBuilding) {
@@ -242,17 +246,27 @@ export class HomePage implements OnInit {
   }
 
   cleanUpTheSelectedVehiclesForMission() {
-    for (const vehicle of this.selectedVehiclesForMission) delete vehicle.isSelected
+    this.removeIsSelectedFromSelectedVehiclesForMission()
     this.selectedVehiclesForMission = []    
   }
   
-  engageVehiclesOnMission(selectedMission) {
+  async engageVehiclesOnMission(selectedMission) {
+    this.removeIsSelectedFromSelectedVehiclesForMission()
+    let engageVehiclesToMissionDto = await this.vehiclesService.engageVehicles(selectedMission, this.selectedVehiclesForMission)
+
     this.cleanUpTheSelectedVehiclesForMission()
-    this.vehiclesService.engageVehicles(selectedMission, this.selectedVehiclesForMission)
+  }
+
+  removeIsSelectedFromSelectedVehiclesForMission() {
+    for (const vehicle of this.selectedVehiclesForMission) delete vehicle.isSelected
   }
 
   payToEndMission(selectedMission) {
 
+  }
+
+  manageVehiclesToBuildingsTouser(state) {
+    
   }
   
   manageMissionsToUser(state) {

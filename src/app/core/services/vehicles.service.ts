@@ -20,7 +20,7 @@ export class VehiclesService {
     engageVehicles(missionToUser: Mission, vehiclesToUserBuilding: VehicleToUserBuilding[]) {
         let headers = this.baseHttpService.returnHeaders()
         return this.http.post(this.vehiclesUrl + '/engage-to-mission', { missionToUser, vehiclesToUserBuilding }, { headers }).toPromise().then((engageVehiclesToMissionDto: EngageVehiclesToMissionDto) => {
-            console.log("TCL: VehiclesService -> engageVehicles -> engageVehiclesToMissionDto", engageVehiclesToMissionDto)
+            return engageVehiclesToMissionDto
         }).catch(error => this.handleError(error))
     }
 
