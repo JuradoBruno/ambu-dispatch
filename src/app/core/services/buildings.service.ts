@@ -15,26 +15,24 @@ export class BuildingsService {
   baseUrl = environment.baseUrl
   // baseUrl = 'https://ambu-dispatch-production.eu-west-1.elasticbeanstalk.com' // Get that from .env
   // 
-  buildingsUrl = this.baseUrl + 'buildings'
+  buildingsUrl = 'buildings'
 
   constructor(
-    private http: HttpClient,
-    private baseHttpService: BaseHttpService,
+    private baseHttp: BaseHttpService,
     private storeBuildings: BuildingsStore,
     private userStore: UserStore,
     private modal: ModalService) { }
 
   getBuildings() {
-    this.http.get<Building[]>(this.buildingsUrl).toPromise().then((buildings: Building[]) => {
+    this.baseHttp.get<Building[]>(this.buildingsUrl).then((buildings: Building[]) => {
       this.storeBuildings.storeBuildings(buildings)
     })
   }
 
   addBuilding(latlng, buildingToCreateAndMoneyType) {
     const { building, moneyType } = buildingToCreateAndMoneyType
-    let headers = this.baseHttpService.returnHeaders()
 
-    return this.http.post(this.buildingsUrl + '/by-coordinates', { latlng, building, moneyType }, { headers }).toPromise().then((user: User) => {
+    return this.baseHttp.post<User>(this.buildingsUrl + '/by-coordinates', { latlng, building, moneyType }).then((user: User) => {
       this.userStore.storeCurrentUser(user)
     }).catch(error => {
       let header = error.error.statusCode === 404? 'Adresse introuvable' : error.error.statusCode
