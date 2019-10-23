@@ -10,18 +10,16 @@ import { environment } from 'src/environments/environment';
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService{
-  
-  baseUrl = environment.baseUrl // Get that from .env
+export class AuthService {
   // baseUrl = 'https://ambu-dispatch-production.eu-west-1.elasticbeanstalk.com/' // Get that from .env
-  authUrl = this.baseUrl + 'auth'
+  authUrl = 'auth'
   @Output() authChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
-  
+
   constructor(
     private http: HttpClient,
-    private baseHttpService: BaseHttpService,
+    private baseHttp: BaseHttpService,
     private userStore: UserStore,
-  ) {}
+  ) { }
 
   getUsername() {
     let username = localStorage.getItem('username')
@@ -30,8 +28,7 @@ export class AuthService{
   }
 
   getUser() {
-    let headers = this.baseHttpService.returnHeaders()
-    return this.http.get(this.authUrl + '/user', {headers}).toPromise().then((user: User) => {
+    return this.baseHttp.get<User>(this.authUrl + '/user').then((user: User) => {
       this.userStore.storeCurrentUser(user)
     })
   }
@@ -42,22 +39,22 @@ export class AuthService{
   }
 
   signin(userData: IUserSigninData): Promise<boolean> {
-    return this.http.post<any>(this.authUrl + '/signin', userData).toPromise().then((response: ISigninDto) => {
+    return this.baseHttp.post<ISigninDto>(this.authUrl + '/signin', userData).then((response: ISigninDto) => {
       if (!response.accessToken) return false // Wrong data incoming
-      this.baseHttpService.saveToken(response.accessToken)
+      this.baseHttp.saveToken(response.accessToken)
       let user = new User(response.user)
       this.userStore.storeCurrentUser(user)
       return true
-    }).catch(error => {      
+    }).catch(error => {
       if (error.status == 401) return false
       console.error(error)
     })
   }
 
   signup(userData: IUserSignupData): Promise<boolean> {
-    return this.http.post<any>(this.authUrl + '/signup', userData).toPromise().then(response => {
+    return this.baseHttp.post<ISigninDto>(this.authUrl + '/signup', userData).then((response: ISigninDto) => {
       if (!response.accessToken) return false // Wrong data incoming
-      this.baseHttpService.saveToken(response.accessToken)
+      this.baseHttp.saveToken(response.accessToken)
       let user = new User(response.user)
       this.userStore.storeCurrentUser(user)
       return true
@@ -80,16 +77,16 @@ export class AuthService{
   }
 
   checkIfUserIsSignedIn() {
-    let token = this.baseHttpService.getTokenFromStorage()
-    
-    return token? true : false
+    let token = this.baseHttp.getTokenFromStorage()
+
+    return token ? true : false
   }
 }
 
 export enum UserActions {
   InitState = '[AUTH] Initialize Auth state',
 
-  StoreCurrentUser = '[AUTH] Store current USER'    
+  StoreCurrentUser = '[AUTH] Store current USER'
 }
 
 export interface IAuthStore {
