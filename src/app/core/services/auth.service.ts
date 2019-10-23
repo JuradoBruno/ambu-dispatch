@@ -1,11 +1,8 @@
 import { Injectable, Output, EventEmitter } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { IUserSigninData, ISigninDto, IUserSignupData } from 'src/app/shared/interfaces';
-import { Observable } from 'rxjs';
 import { BaseHttpService } from './base-http.service';
 import { User } from 'src/app/models/User.model';
 import { UserStore } from '../stores/user.store';
-import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +13,6 @@ export class AuthService {
   @Output() authChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   constructor(
-    private http: HttpClient,
     private baseHttp: BaseHttpService,
     private userStore: UserStore,
   ) { }
@@ -39,7 +35,7 @@ export class AuthService {
   }
 
   signin(userData: IUserSigninData): Promise<boolean> {
-    return this.baseHttp.post<ISigninDto>(this.authUrl + '/signin', userData).then((response: ISigninDto) => {
+    return this.baseHttp.post<ISigninDto>(this.authUrl + '/signin', userData, {}, false).then((response: ISigninDto) => {
       if (!response.accessToken) return false // Wrong data incoming
       this.baseHttp.saveToken(response.accessToken)
       let user = new User(response.user)
@@ -63,17 +59,6 @@ export class AuthService {
 
   signout() {
     localStorage.removeItem('accessToken')
-  }
-
-  private handleError(error: HttpErrorResponse) {
-    console.error('server error:', error);
-    if (error.error instanceof Error) {
-      const errMessage = error.error.message;
-      return Observable.throw(errMessage);
-      // Use the following instead if using lite-server
-      // return Observable.throw(err.text() || 'backend server error');
-    }
-    return Observable.throw(error || 'Server error');
   }
 
   checkIfUserIsSignedIn() {

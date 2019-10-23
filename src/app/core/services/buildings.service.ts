@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Building } from 'src/app/models/Building.model';
 import { BuildingsStore } from '../stores/buildings.store';
 import { environment } from 'src/environments/environment';
@@ -32,7 +31,7 @@ export class BuildingsService {
   addBuilding(latlng, buildingToCreateAndMoneyType) {
     const { building, moneyType } = buildingToCreateAndMoneyType
 
-    return this.baseHttp.post<User>(this.buildingsUrl + '/by-coordinates', { latlng, building, moneyType }).then((user: User) => {
+    return this.baseHttp.post<User>(this.buildingsUrl + '/by-coordinates', { latlng, building, moneyType }, {}, false).then((user: User) => {
       this.userStore.storeCurrentUser(user)
     }).catch(error => {
       let header = error.error.statusCode === 404? 'Adresse introuvable' : error.error.statusCode
